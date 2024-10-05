@@ -1,0 +1,6 @@
+controller\UserController.class
+connection\DatabaseConnection.class
+service\Client.class
+run\ServerRun.class
+service\ClientManager.class
+model\UserModel.class
