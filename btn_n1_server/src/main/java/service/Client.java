@@ -81,6 +81,11 @@ public class Client implements Runnable {
         }
 
     }
+    
+    public void handleGameRequest(String request) {
+        // Phân tích yêu cầu từ client, ví dụ "ANSWER:XXX"
+        // Gửi đến `GameSession` để xử lý câu trả lời.
+    }
 
     // send data fucntions
     public String sendData(String data) {

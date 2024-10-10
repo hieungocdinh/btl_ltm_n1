@@ -1,6 +1,8 @@
 package service;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  *
@@ -9,6 +11,7 @@ import java.util.ArrayList;
 public class ClientManager {
 
     ArrayList<Client> clients;
+    private Map<String, GameSession> gameSessions = new HashMap<>();
 
     public ClientManager() {
         clients = new ArrayList<>();
@@ -28,6 +31,16 @@ public class ClientManager {
             return true;
         }
         return false;
+    }
+    
+    public void createGameSession(String player1, String player2) {
+        GameSession session = new GameSession(player1, player2);
+        gameSessions.put(player1 + "-" + player2, session);
+        session.sendNextQuestion(); // Gửi câu hỏi đầu tiên
+    }
+
+    public GameSession getGameSession(String player1, String player2) {
+        return gameSessions.get(player1 + "-" + player2);
     }
 
 //    public Client find(String username) {
