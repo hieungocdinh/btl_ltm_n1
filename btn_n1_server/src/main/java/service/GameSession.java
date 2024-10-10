@@ -1,14 +1,14 @@
 package service;
 
 public class GameSession {
-    private String player1;
-    private String player2;
+    private Client player1;
+    private Client player2;
     private int player1Score;
     private int player2Score;
     private int currentRound;
     private boolean isFinished;
 
-    public GameSession(String player1, String player2) {
+    public GameSession(Client player1, Client player2) {
         this.player1 = player1;
         this.player2 = player2;
         this.player1Score = 0;

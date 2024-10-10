@@ -33,9 +33,9 @@ public class ClientManager {
         return false;
     }
     
-    public void createGameSession(String player1, String player2) {
+    public void createGameSession(Client player1, Client player2) {
         GameSession session = new GameSession(player1, player2);
-        gameSessions.put(player1 + "-" + player2, session);
+        gameSessions.put(player1.getLoginUserId() + "-" + player2.getLoginUserId(), session);
         session.sendNextQuestion(); // Gửi câu hỏi đầu tiên
     }
 

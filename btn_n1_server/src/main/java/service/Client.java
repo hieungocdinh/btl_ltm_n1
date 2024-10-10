@@ -27,7 +27,12 @@ public class Client implements Runnable {
     DataOutputStream dos;
 
     String loginUser;
+    String loginUserId;
     Client cCompetitor;
+
+    public String getLoginUserId() {
+        return loginUserId;
+    }
 
     public Client(Socket s) throws IOException {
         this.s = s;
@@ -110,6 +115,7 @@ public class Client implements Runnable {
         if (result.split(";")[0].equals("success")) {
             // set login user
             this.loginUser = username;
+            this.loginUserId = username;
         }
 
         // send result
