@@ -72,5 +72,15 @@ public class UserController {
             return "failed;" + e.getMessage();
         }
     }
-
+    
+    public void updateScore(String userId, float score) {
+//        String sql = "UPDATE users SET total_score = total_score + ? WHERE id = ?";
+//        try (PreparedStatement stmt = con.prepareStatement(sql)) {
+//            stmt.setFloat(1, score);
+//            stmt.setInt(2, userId);
+//            stmt.executeUpdate();
+//        } catch (SQLException e) {
+//            e.printStackTrace();
+//        }
+    }
 }

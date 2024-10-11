@@ -33,20 +33,20 @@ public class QuestionController {
         }
         return null;
     }
-
-//    public boolean checkAnswer(int questionId, String answer) {
-//        String sql = "SELECT answer FROM questions WHERE id = ?";
-//        try (PreparedStatement stmt = con.prepareStatement(sql)) {
-//            stmt.setInt(1, questionId);
-//            ResultSet rs = stmt.executeQuery();
-//            if (rs.next()) {
-//                String correctAnswer = rs.getString("answer");
-//                // So sánh đáp án không phân biệt hoa thường và bỏ khoảng trắng
-//                return correctAnswer.equalsIgnoreCase(answer.trim());
-//            }
-//        } catch (SQLException e) {
-//            e.printStackTrace();
-//        }
-//        return false;
-//    }
+    
+    public boolean checkAnswer(int questionId, String answer) {
+        String sql = "SELECT answer FROM questions WHERE id = ?";
+        try (PreparedStatement stmt = con.prepareStatement(sql)) {
+            stmt.setInt(1, questionId);
+            ResultSet rs = stmt.executeQuery();
+            if (rs.next()) {
+                String correctAnswer = rs.getString("answer");
+                // So sánh đáp án không phân biệt hoa thường và bỏ khoảng trắng
+                return correctAnswer.equalsIgnoreCase(answer.trim());
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
 }
