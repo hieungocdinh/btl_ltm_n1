@@ -1,6 +1,7 @@
 package service;
 
 import controller.QuestionController;
+import controller.ResultController;
 import controller.UserController;
 import model.QuestionModel;
 import run.ServerRun;
@@ -131,32 +132,38 @@ public class GameSession {
     public void endGame() {
         String result;
         UserController userController = new UserController();
+        ResultController resultController = new ResultController();
+
+        // Giả sử bạn có phương thức getUserId() trong Client để lấy id của người chơi.
+        String player1Id = player1.getLoginUserId();
+        String player2Id = player2.getLoginUserId();
 
         if (player1Score > player2Score) {
-            result = "WIN:" + player1.getLoginUserId();
+            result = "USER1";
             player1.sendData("WIN;You won the game!");
             player2.sendData("LOSE;You lost the game.");
 
             // Cập nhật điểm số cho người thắng và người thua
-            userController.updateScore(player1.getLoginUserId(), 1);
-
+            userController.updateScore(player1Id, 1);
         } else if (player2Score > player1Score) {
-            result = "WIN:" + player2.getLoginUserId();
+            result = "USER2";
             player2.sendData("WIN;You won the game!");
             player1.sendData("LOSE;You lost the game.");
 
             // Cập nhật điểm số cho người thắng và người thua
-            userController.updateScore(player2.getLoginUserId(), 1);
-
+            userController.updateScore(player2Id, 1);
         } else {
-            result = "DRAW";
+            result = "HOA";
             player1.sendData("DRAW;The game is a draw.");
             player2.sendData("DRAW;The game is a draw.");
 
             // Cập nhật điểm số cho cả hai người chơi trong trường hợp hòa
-            userController.updateScore(player1.getLoginUserId(), 0.5f);
-            userController.updateScore(player2.getLoginUserId(), 0.5f);
+            userController.updateScore(player1Id, 0.5f);
+            userController.updateScore(player2Id, 0.5f);
         }
+
+        // Lưu kết quả trận đấu vào bảng `results`
+        resultController.saveResult(player1Id, player2Id, result);
 
         // Đánh dấu trò chơi đã kết thúc
         isFinished = true;
