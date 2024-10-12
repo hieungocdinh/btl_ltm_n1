@@ -1,5 +1,7 @@
 package view;
 
+import java.awt.Image;
+import java.net.URL;
 import javax.swing.ImageIcon;
 import javax.swing.JLabel;
 
@@ -10,31 +12,47 @@ import javax.swing.JLabel;
 public class MatchView extends javax.swing.JFrame {
 
     private JLabel imageLabel;
+
     /**
      * Creates new form MatchView
      */
     public MatchView() {
         initComponents();
-        loadImage();
     }
-    
-     private void loadImage() {
-        // Đường dẫn tới ảnh của bạn
-        String imagePath = "C:\\Users\\admin\\Downloads\\image(1).jpg"; // Thay thế bằng đường dẫn ảnh thực tế
 
-        // Tạo ImageIcon từ file ảnh
-        ImageIcon imageIcon = new ImageIcon(imagePath);
+    public void displayQuestion(int questionId, String questionText, String imageLink) {
+        // Hiển thị câu hỏi
+        jLabel4.setText(questionText);
 
-        // Khởi tạo JLabel và gán ảnh
-        imageLabel = new JLabel();
-        imageLabel.setIcon(imageIcon);
+        // Hiển thị hình ảnh nếu có 
+        loadImage(imageLink);
+    }
 
-        // Thêm JLabel chứa ảnh vào jPanel1
-        jPanel1.add(imageLabel);
+    private void loadImage(String imageUrl) {
+        try {
+            URL url = new URL(imageUrl);  // Dùng URL nếu bạn lưu link ảnh từ web
+            ImageIcon imageIcon = new ImageIcon(url);
+            Image image = imageIcon.getImage(); // Lấy Image từ ImageIcon
+            Image scaledImage = image.getScaledInstance(jPanel1.getWidth(), jPanel1.getHeight(), Image.SCALE_SMOOTH); // Thay đổi kích thước ảnh theo kích thước jPanel1
+            imageIcon = new ImageIcon(scaledImage);
 
-        // Cập nhật giao diện để hiển thị ảnh
-        jPanel1.revalidate();
-        jPanel1.repaint();
+            // Xóa tất cả thành phần cũ trong jPanel1 trước khi thêm ảnh mới
+            jPanel1.removeAll();
+
+            // Tạo JLabel chứa hình ảnh và thêm vào jPanel1
+            imageLabel = new JLabel();
+            imageLabel.setIcon(imageIcon);
+
+            // Đặt Layout cho jPanel1 là BorderLayout (để ảnh chiếm toàn bộ diện tích)
+            jPanel1.setLayout(new java.awt.BorderLayout());
+            jPanel1.add(imageLabel, java.awt.BorderLayout.CENTER);
+
+            // Cập nhật giao diện
+            jPanel1.revalidate();
+            jPanel1.repaint();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     /**
@@ -53,6 +71,7 @@ public class MatchView extends javax.swing.JFrame {
         jTextField3 = new javax.swing.JTextField();
         jButton2 = new javax.swing.JButton();
         jLabel3 = new javax.swing.JLabel();
+        jLabel4 = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -105,6 +124,9 @@ public class MatchView extends javax.swing.JFrame {
                 .addContainerGap())
         );
 
+        jLabel4.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        jLabel4.setText("jLabel4");
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
@@ -119,7 +141,9 @@ public class MatchView extends javax.swing.JFrame {
                 .addComponent(jPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                 .addGap(0, 0, Short.MAX_VALUE)
-                .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
+                    .addComponent(jLabel4, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addGap(120, 120, 120))
         );
         layout.setVerticalGroup(
@@ -129,7 +153,9 @@ public class MatchView extends javax.swing.JFrame {
                 .addComponent(jLabel1)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jLabel2)
-                .addGap(49, 49, 49)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jLabel4, javax.swing.GroupLayout.PREFERRED_SIZE, 19, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(24, 24, 24)
                 .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 45, Short.MAX_VALUE)
                 .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -166,6 +192,16 @@ public class MatchView extends javax.swing.JFrame {
         }
         //</editor-fold>
 
+        // Tạo một instance của MatchView và hiển thị giao diện
+        MatchView matchView = new MatchView();
+        matchView.setVisible(true);
+
+        // Giả lập hiển thị một câu hỏi và link hình ảnh từ mạng
+//        String questionText = "Đây là câu hỏi ví dụ";
+//        String imageLink = "https://upload.wikimedia.org/wikipedia/commons/4/47/PNG_transparency_demonstration_1.png"; // Link ảnh hợp lệ
+//
+//        // Gọi phương thức displayQuestion để hiển thị câu hỏi
+//        matchView.displayQuestion(1, questionText, imageLink);
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
@@ -179,6 +215,7 @@ public class MatchView extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
+    private javax.swing.JLabel jLabel4;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JTextField jTextField3;
