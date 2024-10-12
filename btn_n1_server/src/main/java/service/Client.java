@@ -27,7 +27,12 @@ public class Client implements Runnable {
     DataOutputStream dos;
 
     String loginUser;
+    String loginUserId;
     Client cCompetitor;
+
+    public String getLoginUserId() {
+        return loginUserId;
+    }
 
     public Client(Socket s) throws IOException {
         this.s = s;
@@ -83,8 +88,22 @@ public class Client implements Runnable {
     }
     
     public void handleGameRequest(String request) {
-        // Phân tích yêu cầu từ client, ví dụ "ANSWER:XXX"
-        // Gửi đến `GameSession` để xử lý câu trả lời.
+        // Phân tích yêu cầu từ client, ví dụ "ANSWER;answer_text"
+        String[] parts = request.split(";");
+        if (parts.length < 2) return;
+
+        String type = parts[0];
+        String answer = parts[1];
+
+        if ("ANSWER".equals(type)) {
+            // Gửi câu trả lời đến GameSession để xử lý
+            GameSession session = ServerRun.clientManager.getGameSessionForPlayer(loginUserId);
+            if (session != null) {
+                session.receiveAnswer(loginUserId, answer);
+            } else {
+                sendData("ERROR; No active game session found.");
+            }
+        }
     }
 
     // send data fucntions
@@ -110,6 +129,7 @@ public class Client implements Runnable {
         if (result.split(";")[0].equals("success")) {
             // set login user
             this.loginUser = username;
+            this.loginUserId = username;
         }
 
         // send result
