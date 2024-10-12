@@ -62,6 +62,9 @@ public class Client implements Runnable {
                     case "LOGIN":
                         onReceiveLogin(received);
                         break;
+                    case "ANSWER":
+                        handleGameRequest(received);
+                        break;
                     case "REGISTER":
                         onReceiveRegister(received);
                     case "GET_USERS": // Thêm trường hợp này
