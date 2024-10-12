@@ -84,6 +84,11 @@ public class SocketHandler {
                         break;
                     case "USER_LIST":
                         onReceiveUserList(received); // Xử lý danh sách người dùng
+                    case "QUESTION":
+                        onReceiveQuestion(received);  // Xử lý câu hỏi
+                        break;
+                    case "ERROR":
+                        // Handle error
                         break;
                 }
             } catch (IOException ex) {
@@ -106,6 +111,16 @@ public class SocketHandler {
      * *
      * Handle from client
      */
+    private void onReceiveQuestion(String received) {
+        String[] parts = received.split(";");
+        int questionId = Integer.parseInt(parts[1]);  // Lấy id câu hỏi
+        String questionText = parts[2];  // Nội dung câu hỏi
+        String imageLink = parts[3];  // Đường dẫn hình ảnh
+
+        // Gọi phương thức để hiển thị câu hỏi trong MatchView
+        ClientRun.matchView.displayQuestion(questionId, questionText, imageLink);
+    }
+
     public void login(String email, String password) {
         // prepare data
         String data = "LOGIN" + ";" + email + ";" + password;

@@ -2,7 +2,6 @@ run\ClientRun.class
 controller\SocketHandler.class
 view\RegisterView$2.class
 view\RegisterView$5.class
-view\MatchView$1.class
 view\RegisterView$1.class
 view\LoginView$2.class
 view\LoginView.class
