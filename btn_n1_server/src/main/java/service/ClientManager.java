@@ -1,6 +1,8 @@
 package service;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  *
@@ -9,6 +11,7 @@ import java.util.ArrayList;
 public class ClientManager {
 
     ArrayList<Client> clients;
+    private Map<String, GameSession> gameSessions = new HashMap<>();
 
     public ClientManager() {
         clients = new ArrayList<>();
@@ -28,6 +31,48 @@ public class ClientManager {
             return true;
         }
         return false;
+    }
+    
+    public void createGameSession(Client player1, Client player2) {
+        GameSession session = new GameSession(player1, player2);
+        gameSessions.put(player1.getLoginUserId() + "-" + player2.getLoginUserId(), session);
+        session.sendNextQuestionToPlayer1(); // Gửi câu hỏi đầu tiên cho user 1
+        session.sendNextQuestionToPlayer2(); // Gửi câu hỏi đầu tiên cho user 2
+    }
+    
+    public GameSession getGameSessionForPlayer(String loginUserId) {
+        // Duyệt qua các phiên chơi trong gameSessions
+        for (GameSession session : gameSessions.values()) {
+            // Kiểm tra nếu người chơi là player1 hoặc player2 trong phiên chơi
+            if (session.getPlayer1().getLoginUserId().equals(loginUserId) ||
+                session.getPlayer2().getLoginUserId().equals(loginUserId)) {
+                return session;
+            }
+        }
+        // Trả về null nếu không tìm thấy phiên chơi
+        return null;
+    }
+
+
+    public GameSession getGameSession(Client player1, Client player2) {
+        return gameSessions.get(player1.getLoginUserId() + "-" + player2.getLoginUserId());
+    }
+    
+    public void removeGameSession(GameSession session) {
+        // Duyệt qua các mục trong gameSessions để tìm phiên chơi tương ứng
+        String sessionKey = null;
+        for (Map.Entry<String, GameSession> entry : gameSessions.entrySet()) {
+            if (entry.getValue().equals(session)) {
+                sessionKey = entry.getKey();
+                break;
+            }
+        }
+
+        // Nếu tìm thấy khóa của phiên chơi, xóa nó khỏi danh sách
+        if (sessionKey != null) {
+            gameSessions.remove(sessionKey);
+            System.out.println("Removed game session: " + sessionKey);
+        }
     }
 
 //    public Client find(String username) {
