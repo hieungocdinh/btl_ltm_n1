@@ -118,6 +118,30 @@ public class SocketHandler {
         ClientRun.matchView.displayQuestion(questionId, questionText, imageLink);
     }
 
+    public void sendAnswer(int questionId, String answer) {
+        String data = "ANSWER;" + questionId + ";" + answer;
+        sendData(data);
+    }
+    
+
+    private void onReceiveAnswerResult(String received) {
+        String[] parts = received.split(";");
+        String result = parts[1];  // Kết quả trả lời: CORRECT/WRONG
+
+        if (result.equals("CORRECT")) {
+            JOptionPane.showMessageDialog(ClientRun.matchView, "Correct Answer!");
+        } else {
+            JOptionPane.showMessageDialog(ClientRun.matchView, "Wrong Answer!");
+        }
+
+        // Kiểm tra xem trận đấu đã kết thúc hay chưa
+        if (parts.length > 2 && parts[2].equals("END")) {
+            String finalResult = parts[3]; // WIN/LOSE/DRAW
+            JOptionPane.showMessageDialog(ClientRun.matchView, "Game Over: " + finalResult);
+            ClientRun.closeScene(ClientRun.SceneName.MATCH); // Đóng scene match khi trận đấu kết thúc
+        }
+    }
+
     public void login(String email, String password) {
         // prepare data
         String data = "LOGIN" + ";" + email + ";" + password;

@@ -7,6 +7,8 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 
 public class QuestionController {
 
@@ -16,24 +18,25 @@ public class QuestionController {
         this.con = DatabaseConnection.getInstance().getConnection();
     }
 
-    public QuestionModel getRandomQuestion() {
-        String sql = "SELECT id, questionText, imageLink, answer FROM questions ORDER BY RAND() LIMIT 1";
+    public List<QuestionModel> getThreeRandomQuestions() {
+        List<QuestionModel> questions = new ArrayList<>();
+        String sql = "SELECT id, questionText, imageLink, answer FROM questions ORDER BY RAND() LIMIT 3";
         try (PreparedStatement stmt = con.prepareStatement(sql)) {
             ResultSet rs = stmt.executeQuery();
-            if (rs.next()) {
+            while (rs.next()) {
                 int id = rs.getInt("id");
                 String questionText = rs.getString("questionText");
                 String imageLink = rs.getString("imageLink");
                 String answer = rs.getString("answer");
 
-                return new QuestionModel(id, questionText, imageLink, answer);
+                questions.add(new QuestionModel(id, questionText, imageLink, answer));
             }
         } catch (SQLException e) {
             e.printStackTrace();
         }
-        return null;
+        return questions;
     }
-    
+
     public boolean checkAnswer(int questionId, String answer) {
         String sql = "SELECT answer FROM questions WHERE id = ?";
         try (PreparedStatement stmt = con.prepareStatement(sql)) {

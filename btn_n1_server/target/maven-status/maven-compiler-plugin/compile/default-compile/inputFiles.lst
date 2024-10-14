@@ -1,6 +1,7 @@
 D:\java\btl_ltm_n1\btn_n1_server\src\main\java\controller\UserController.java
 D:\java\btl_ltm_n1\btn_n1_server\src\main\java\model\UserModel.java
 D:\java\btl_ltm_n1\btn_n1_server\src\main\java\controller\QuestionController.java
+D:\java\btl_ltm_n1\btn_n1_server\src\main\java\controller\ResultController.java
 D:\java\btl_ltm_n1\btn_n1_server\src\main\java\model\QuestionModel.java
 D:\java\btl_ltm_n1\btn_n1_server\src\main\java\service\Client.java
 D:\java\btl_ltm_n1\btn_n1_server\src\main\java\connection\DatabaseConnection.java

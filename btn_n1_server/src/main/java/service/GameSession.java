@@ -3,16 +3,22 @@ package service;
 import controller.QuestionController;
 import controller.ResultController;
 import controller.UserController;
+import java.util.List;
 import model.QuestionModel;
 import run.ServerRun;
 
 public class GameSession {
+
     private Client player1;
     private Client player2;
     private int player1Score;
     private int player2Score;
     private int currentRound1;
     private int currentRound2;
+    private List<QuestionModel> player1Questions;
+    private List<QuestionModel> player2Questions;
+    private int currentQuestionIndex1 = 0;
+    private int currentQuestionIndex2 = 0;
     private int currentQuestionId1;
     private int currentQuestionId2;
     private boolean isFinished;
@@ -26,7 +32,7 @@ public class GameSession {
         this.currentRound2 = 0;
         this.isFinished = false;
     }
-    
+
     public Client getPlayer1() {
         return player1;
     }
@@ -35,49 +41,45 @@ public class GameSession {
         return player2;
     }
 
-    public void sendNextQuestionToPlayer1() {
-        // Tạo đối tượng QuestionController để lấy câu hỏi
+    public void startGame() {
         QuestionController questionController = new QuestionController();
-        // Lấy một câu hỏi ngẫu nhiên từ cơ sở dữ liệu
-        QuestionModel question = questionController.getRandomQuestion();
 
-        // Kiểm tra nếu lấy được câu hỏi từ cơ sở dữ liệu
-        if (question != null) {
-            // Lưu lại ID của câu hỏi hiện tại để sử dụng khi kiểm tra đáp án
+        // Lấy 3 câu hỏi cho mỗi người chơi
+        player1Questions = questionController.getThreeRandomQuestions();
+        player2Questions = questionController.getThreeRandomQuestions();
+
+        // Gửi câu hỏi đầu tiên cho mỗi người chơi
+        sendNextQuestionToPlayer1();
+        sendNextQuestionToPlayer2();
+    }
+
+    public void sendNextQuestionToPlayer1() {
+        if (currentQuestionIndex1 < 3) {
+            QuestionModel question = player1Questions.get(currentQuestionIndex1);
             currentQuestionId1 = question.getId();
             currentRound1++;
 
-            // Tạo thông điệp chứa nội dung câu hỏi và đường dẫn hình ảnh
             String questionMessage = "QUESTION;" + question.getId() + ";" + question.getQuestionText() + ";" + question.getImageLink();
-
-            // Gửi câu hỏi đến người chơi cụ thể
             player1.sendData(questionMessage);
+
+            currentQuestionIndex1++;
         } else {
-            // Trường hợp không lấy được câu hỏi, gửi thông báo lỗi
-            player1.sendData("ERROR; Unable to retrieve question.");
+            player1.sendData("ERROR; No more questions available.");
         }
     }
-    
-    public void sendNextQuestionToPlayer2() {
-        // Tạo đối tượng QuestionController để lấy câu hỏi
-        QuestionController questionController = new QuestionController();
-        // Lấy một câu hỏi ngẫu nhiên từ cơ sở dữ liệu
-        QuestionModel question = questionController.getRandomQuestion();
 
-        // Kiểm tra nếu lấy được câu hỏi từ cơ sở dữ liệu
-        if (question != null) {
-            // Lưu lại ID của câu hỏi hiện tại để sử dụng khi kiểm tra đáp án
+    public void sendNextQuestionToPlayer2() {
+        if (currentQuestionIndex2 < 3) {
+            QuestionModel question = player2Questions.get(currentQuestionIndex2);
             currentQuestionId2 = question.getId();
             currentRound2++;
 
-            // Tạo thông điệp chứa nội dung câu hỏi và đường dẫn hình ảnh
             String questionMessage = "QUESTION;" + question.getId() + ";" + question.getQuestionText() + ";" + question.getImageLink();
-
-            // Gửi câu hỏi đến người chơi cụ thể
             player2.sendData(questionMessage);
+
+            currentQuestionIndex2++;
         } else {
-            // Trường hợp không lấy được câu hỏi, gửi thông báo lỗi
-            player2.sendData("ERROR; Unable to retrieve question.");
+            player2.sendData("ERROR; No more questions available.");
         }
     }
 
@@ -85,33 +87,28 @@ public class GameSession {
         QuestionController questionController = new QuestionController();
         boolean isCorrect = false;
 
-        // Kiểm tra nếu người chơi là player1
         if (playerId.equals(player1.getLoginUserId())) {
             isCorrect = questionController.checkAnswer(currentQuestionId1, answer);
             if (isCorrect) {
                 player1Score++;
             }
-        }
-        // Kiểm tra nếu người chơi là player2
-        else if (playerId.equals(player2.getLoginUserId())) {
+        } else if (playerId.equals(player2.getLoginUserId())) {
             isCorrect = questionController.checkAnswer(currentQuestionId2, answer);
             if (isCorrect) {
                 player2Score++;
             }
         }
 
-        // Gửi phản hồi đến client tương ứng
         Client respondingClient = playerId.equals(player1.getLoginUserId()) ? player1 : player2;
         respondingClient.sendData(isCorrect ? "CORRECT" : "WRONG");
 
-        // Kiểm tra nếu trò chơi đã kết thúc
         if (isGameOver()) {
             endGame();
         } else {
-            // Tiếp tục gửi câu hỏi tiếp theo cho người chơi
+            // Chuyển câu hỏi tiếp theo sau khi nhận được đáp án
             if (playerId.equals(player1.getLoginUserId())) {
                 sendNextQuestionToPlayer1();
-            } else if (playerId.equals(player2.getLoginUserId())) {
+            } else {
                 sendNextQuestionToPlayer2();
             }
         }
@@ -131,44 +128,25 @@ public class GameSession {
 
     public void endGame() {
         String result;
-        UserController userController = new UserController();
-        ResultController resultController = new ResultController();
-
-        // Giả sử bạn có phương thức getUserId() trong Client để lấy id của người chơi.
-        String player1Id = player1.getLoginUserId();
-        String player2Id = player2.getLoginUserId();
-
         if (player1Score > player2Score) {
-            result = "USER1";
-            player1.sendData("WIN;You won the game!");
-            player2.sendData("LOSE;You lost the game.");
-
-            // Cập nhật điểm số cho người thắng và người thua
-            userController.updateScore(player1Id, 1);
+            result = "WIN";
+            player1.sendData("ANSWER_RESULT;END;WIN");
+            player2.sendData("ANSWER_RESULT;END;LOSE");
         } else if (player2Score > player1Score) {
-            result = "USER2";
-            player2.sendData("WIN;You won the game!");
-            player1.sendData("LOSE;You lost the game.");
-
-            // Cập nhật điểm số cho người thắng và người thua
-            userController.updateScore(player2Id, 1);
+            result = "WIN";
+            player2.sendData("ANSWER_RESULT;END;WIN");
+            player1.sendData("ANSWER_RESULT;END;LOSE");
         } else {
-            result = "HOA";
-            player1.sendData("DRAW;The game is a draw.");
-            player2.sendData("DRAW;The game is a draw.");
-
-            // Cập nhật điểm số cho cả hai người chơi trong trường hợp hòa
-            userController.updateScore(player1Id, 0.5f);
-            userController.updateScore(player2Id, 0.5f);
+            result = "DRAW";
+            player1.sendData("ANSWER_RESULT;END;DRAW");
+            player2.sendData("ANSWER_RESULT;END;DRAW");
         }
 
-        // Lưu kết quả trận đấu vào bảng `results`
-        resultController.saveResult(player1Id, player2Id, result);
+        // Cập nhật vào bảng kết quả
+        ResultController resultController = new ResultController();
+        resultController.saveResult(player1.getLoginUserId(), player2.getLoginUserId(), result);
 
-        // Đánh dấu trò chơi đã kết thúc
-        isFinished = true;
-
-        // Loại bỏ phiên chơi khỏi ClientManager
+        // Đóng phiên chơi
         ServerRun.clientManager.removeGameSession(this);
     }
 }

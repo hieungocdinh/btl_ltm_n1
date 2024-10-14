@@ -1,5 +1,6 @@
 run\ClientRun.class
 controller\SocketHandler.class
+view\MatchView$2.class
 view\RegisterView$2.class
 view\RegisterView$5.class
 view\RegisterView$1.class

@@ -1,9 +1,13 @@
 package view;
 
 import java.awt.Image;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.net.URL;
 import javax.swing.ImageIcon;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+import run.ClientRun;
 
 /**
  *
@@ -12,18 +16,28 @@ import javax.swing.JLabel;
 public class MatchView extends javax.swing.JFrame {
 
     private JLabel imageLabel;
+    private int currentQuestion = 1;
+    private int correctAnswers = 0; // Đếm số câu trả lời đúng
+    private int currentQuestionId;
 
     /**
      * Creates new form MatchView
      */
     public MatchView() {
         initComponents();
+        jButton2.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                sendAnswer();
+            }
+        });
     }
 
     public void displayQuestion(int questionId, String questionText, String imageLink) {
+        this.currentQuestionId = questionId;
         // Hiển thị câu hỏi
         jLabel4.setText(questionText);
-
+        jLabel1.setText("Câu hỏi thứ: " + currentQuestion);
         // Hiển thị hình ảnh nếu có 
         loadImage(imageLink);
     }
@@ -53,6 +67,35 @@ public class MatchView extends javax.swing.JFrame {
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    private void sendAnswer() {
+        String answer = jTextField3.getText(); // Lấy đáp án từ người dùng nhập vào
+        if (answer.trim().isEmpty()) {
+            JOptionPane.showMessageDialog(this, "Vui lòng nhập đáp án trước khi gửi!");
+            return;
+        }
+
+        // Gửi đáp án qua SocketHandler
+        ClientRun.socketHandler.sendAnswer(currentQuestionId, answer);
+
+        // Xóa trường nhập sau khi gửi
+        jTextField3.setText("");
+    }
+
+    // Phương thức cập nhật khi nhận được phản hồi đúng/sai từ server
+    public void receiveResult(boolean isCorrect) {
+        if (isCorrect) {
+            correctAnswers++;
+            jLabel2.setText("Số câu trả lời đúng: " + correctAnswers);
+        } else {
+            JOptionPane.showMessageDialog(this, "Đáp án không đúng, hãy thử lại ở câu tiếp theo.");
+        }
+
+        // Cập nhật số câu hỏi
+        currentQuestion++;
+
+        // Tiếp tục chờ câu hỏi tiếp theo từ server
     }
 
     /**
@@ -193,10 +236,10 @@ public class MatchView extends javax.swing.JFrame {
         //</editor-fold>
 
         // Tạo một instance của MatchView và hiển thị giao diện
-        MatchView matchView = new MatchView();
-        matchView.setVisible(true);
-
-        // Giả lập hiển thị một câu hỏi và link hình ảnh từ mạng
+//        MatchView matchView = new MatchView();
+//        matchView.setVisible(true);
+//
+////         Giả lập hiển thị một câu hỏi và link hình ảnh từ mạng
 //        String questionText = "Đây là câu hỏi ví dụ";
 //        String imageLink = "https://upload.wikimedia.org/wikipedia/commons/4/47/PNG_transparency_demonstration_1.png"; // Link ảnh hợp lệ
 //
