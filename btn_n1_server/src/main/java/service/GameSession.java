@@ -48,7 +48,7 @@ public class GameSession {
             currentRound1++;
 
             // Tạo thông điệp chứa nội dung câu hỏi và đường dẫn hình ảnh
-            String questionMessage = "QUESTION;" + question.getQuestionText() + ";" + question.getImageLink();
+            String questionMessage = "QUESTION;" + question.getId() + ";" + question.getQuestionText() + ";" + question.getImageLink();
 
             // Gửi câu hỏi đến người chơi cụ thể
             player1.sendData(questionMessage);
@@ -71,7 +71,7 @@ public class GameSession {
             currentRound2++;
 
             // Tạo thông điệp chứa nội dung câu hỏi và đường dẫn hình ảnh
-            String questionMessage = "QUESTION;" + question.getQuestionText() + ";" + question.getImageLink();
+            String questionMessage = "QUESTION;" + question.getId() + ";" + question.getQuestionText() + ";" + question.getImageLink();
 
             // Gửi câu hỏi đến người chơi cụ thể
             player2.sendData(questionMessage);
