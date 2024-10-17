@@ -16,6 +16,15 @@ public class ClientManager {
     public ClientManager() {
         clients = new ArrayList<>();
     }
+    
+    public Client getClientById(String userId) {
+        for (Client c : clients) {
+            if (c.getLoginUserId().equals(userId)) {
+                return c;
+            }
+        }
+        return null;
+    }
 
     public boolean add(Client c) {
         if (!clients.contains(c)) {

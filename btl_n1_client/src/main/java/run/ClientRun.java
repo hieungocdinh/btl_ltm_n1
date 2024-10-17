@@ -7,7 +7,9 @@ package run;
 import controller.SocketHandler;
 
 import view.LoginView;
+import view.MatchView;
 import view.RegisterView;
+import view.ListView;
 
 /**
  *
@@ -18,10 +20,14 @@ public class ClientRun {
     public enum SceneName {
         LOGIN,
         REGISTER,
+        LIST,
+        MATCH,
     }
     // scenes
     public static LoginView loginView;
     public static RegisterView registerView;
+    public static ListView listView;
+    public static MatchView matchView;
 
     // controller 
     public static SocketHandler socketHandler;
@@ -29,7 +35,7 @@ public class ClientRun {
     public ClientRun() {
         socketHandler = new SocketHandler();
         initScene();
-        
+
         //connect server
         new Thread(() -> {
             // call controller
@@ -44,12 +50,14 @@ public class ClientRun {
             }
         }).start();
     }
-    
+
     public void initScene() {
         loginView = new LoginView();
         registerView = new RegisterView();
+        listView = new ListView();
+        matchView = new MatchView();
     }
-    
+
     public static void openScene(SceneName sceneName) {
         if (null != sceneName) {
             switch (sceneName) {
@@ -59,12 +67,19 @@ public class ClientRun {
                 case REGISTER:
                     registerView.setVisible(true);
                     break;
+                case LIST:
+                    if (listView == null) {
+                        listView = new ListView();
+                    }
+                    listView.loadUserList();
+                    listView.setVisible(true);
+                    break;
                 default:
                     break;
             }
         }
     }
-    
+
     public static void closeScene(SceneName sceneName) {
         if (null != sceneName) {
             switch (sceneName) {
@@ -74,12 +89,15 @@ public class ClientRun {
                 case REGISTER:
                     registerView.dispose();
                     break;
+                case LIST:
+                    listView.dispose();
+                    break;
                 default:
                     break;
             }
         }
     }
-    
+
     public static void closeAllScene() {
         loginView.dispose();
     }

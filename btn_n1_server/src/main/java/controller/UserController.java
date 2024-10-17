@@ -7,6 +7,8 @@ import java.sql.SQLException;
 import java.sql.Statement;
 
 import connection.DatabaseConnection;
+import java.util.ArrayList;
+import java.util.List;
 import model.UserModel;
 
 public class UserController {
@@ -16,7 +18,7 @@ public class UserController {
 
     private final String CHECK_USER = "SELECT username from users WHERE username = ? limit 1";
 
-    private final String LOGIN_USER = "SELECT username, password, total_score FROM users WHERE username=? AND password=?";
+    private final String LOGIN_USER = "SELECT id, username, password, total_score FROM users WHERE username=? AND password=?";
 
     private final String GET_INFO_USER = "SELECT username, password, score, win, draw, lose, avgCompetitor, avgTime FROM users WHERE username=?";
 
@@ -62,8 +64,9 @@ public class UserController {
             ResultSet r = p.executeQuery();
 
             if (r.next()) {
+                int id = r.getInt("id");
                 float score = r.getFloat("total_score");
-                return "success;" + username + ";" + score;
+                return "success;" + id + ";" + username + ";" + score;
             } else {
                 return "failed;" + "Please enter the correct account password!";
             }
@@ -83,4 +86,31 @@ public class UserController {
 //            e.printStackTrace();
 //        }
     }
+    
+    public List<UserModel> getAllUsers() {
+        List<UserModel> users = new ArrayList<>();
+        // Thêm ID vào truy vấn
+        String GET_ALL_USERS = "SELECT id, username, full_name, total_score FROM users"; 
+
+        try (Statement stmt = con.createStatement();
+             ResultSet rs = stmt.executeQuery(GET_ALL_USERS)) {
+
+            while (rs.next()) {
+                // Lấy ID từ ResultSet
+                int id = rs.getInt("id"); // Thêm dòng này để lấy ID
+                String username = rs.getString("username");
+                String fullName = rs.getString("full_name");
+                float totalScore = rs.getFloat("total_score");
+
+                // Giả sử UserModel có một constructor có 4 tham số để nhận ID
+                UserModel user = new UserModel(id, username, fullName, totalScore);
+                users.add(user);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return users;
+    }
+
 }

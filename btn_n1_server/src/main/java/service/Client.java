@@ -15,6 +15,8 @@ import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.sql.SQLException;
+import java.util.List;
+import model.UserModel;
 
 /**
  *
@@ -60,8 +62,17 @@ public class Client implements Runnable {
                     case "LOGIN":
                         onReceiveLogin(received);
                         break;
+                    case "ANSWER":
+                        handleGameRequest(received);
+                        break;
                     case "REGISTER":
                         onReceiveRegister(received);
+                    case "GET_USERS": // Thêm trường hợp này
+                        onRequestUserList(); // Gọi phương thức xử lý yêu cầu
+                        break;
+                    case "CREATE_GAME":  // Xử lý yêu cầu tạo game session
+                        onRequestCreateGame(received);
+                        break;
                     case "EXIT":
                         running = false;
                 }
@@ -85,6 +96,47 @@ public class Client implements Runnable {
             Logger.getLogger(Client.class.getName()).log(Level.SEVERE, null, ex);
         }
 
+    }
+    
+    private void onRequestCreateGame(String received) {
+        // CREATE_GAME:userId1;userId2
+        // Phân tích cú pháp yêu cầu
+        String[] parts = received.split(";");
+        if (parts.length < 3) return;
+
+        String player1Id = parts[1]; // userId1
+        String player2Id = parts[2]; // userId2
+
+        // Tìm client theo id
+        Client player1 = ServerRun.clientManager.getClientById(player1Id);
+        Client player2 = ServerRun.clientManager.getClientById(player2Id);
+
+        // Kiểm tra nếu cả 2 người chơi đều có mặt
+        if (player1 != null && player2 != null) {
+            // Tạo game session
+            ServerRun.clientManager.createGameSession(player1, player2);
+        } else {
+            sendData("ERROR; One or both players not found.");
+        }
+    }
+    
+    private void onRequestUserList() {
+        UserController userController = new UserController();
+        List<UserModel> users = userController.getAllUsers(); 
+
+        // Tạo chuỗi kết quả để gửi lại cho client
+        StringBuilder userList = new StringBuilder("USER_LIST;");
+        for (UserModel user : users) {
+            userList.append(user.getId()).append(";")
+                    .append(user.getUsername()).append(";")
+                    .append(user.getFullName()).append(";")
+                    .append(user.getTotalScore()).append(";"); // Có thể thay đổi thông tin gửi đi nếu cần
+        }
+        
+        System.out.println("Gui yeu cau ve client");
+
+        // Gửi danh sách người dùng về client
+        sendData(userList.toString());
     }
     
     public void handleGameRequest(String request) {
@@ -125,11 +177,13 @@ public class Client implements Runnable {
 
         // check login
         String result = new UserController().login(username, password);
+        String[] parts = result.split(";"); // Phân tách chuỗi theo dấu ";"
 
         if (result.split(";")[0].equals("success")) {
             // set login user
             this.loginUser = username;
-            this.loginUserId = username;
+            this.loginUserId = parts[1];
+            System.out.println("id da login: " + loginUserId);
         }
 
         // send result
