@@ -8,6 +8,7 @@ import controller.SocketHandler;
 
 import view.LoginView;
 import view.RegisterView;
+import view.ListView;
 
 /**
  *
@@ -18,10 +19,12 @@ public class ClientRun {
     public enum SceneName {
         LOGIN,
         REGISTER,
+        LIST,
     }
     // scenes
     public static LoginView loginView;
     public static RegisterView registerView;
+    public static ListView listView;
 
     // controller 
     public static SocketHandler socketHandler;
@@ -48,6 +51,7 @@ public class ClientRun {
     public void initScene() {
         loginView = new LoginView();
         registerView = new RegisterView();
+        listView = new ListView();
     }
     
     public static void openScene(SceneName sceneName) {
@@ -58,6 +62,13 @@ public class ClientRun {
                     break;
                 case REGISTER:
                     registerView.setVisible(true);
+                    break;
+                case LIST:
+                    if (listView == null) {
+                        listView = new ListView();
+                    }
+                    listView.loadUserList();
+                    listView.setVisible(true);
                     break;
                 default:
                     break;
@@ -73,6 +84,9 @@ public class ClientRun {
                     break;
                 case REGISTER:
                     registerView.dispose();
+                    break;
+                case LIST:
+                    listView.dispose();
                     break;
                 default:
                     break;

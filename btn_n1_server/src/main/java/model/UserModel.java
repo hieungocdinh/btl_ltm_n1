@@ -14,13 +14,20 @@ public class UserModel {
     private String username;
     private String password;
     private String fullName;
-    private int totalScore;
+    private float totalScore;
 
     // Constructor không có id
     public UserModel(String username, String fullName, String password, int totalScore) {
         this.username = username;
         this.fullName = fullName;
         this.password = password;
+        this.totalScore = totalScore;
+    }
+    
+    public UserModel(int id, String username, String fullName, float totalScore) {
+        this.id = id;
+        this.username = username;
+        this.fullName = fullName;
         this.totalScore = totalScore;
     }
 
@@ -58,7 +65,7 @@ public class UserModel {
         this.password = password;
     }
 
-    public int getTotalScore() {
+    public float getTotalScore() {
         return totalScore;
     }
 

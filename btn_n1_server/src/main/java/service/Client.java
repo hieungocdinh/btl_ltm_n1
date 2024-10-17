@@ -15,6 +15,8 @@ import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.sql.SQLException;
+import java.util.List;
+import model.UserModel;
 
 /**
  *
@@ -62,6 +64,9 @@ public class Client implements Runnable {
                         break;
                     case "REGISTER":
                         onReceiveRegister(received);
+                    case "GET_USERS": // Thêm trường hợp này
+                        onRequestUserList(); // Gọi phương thức xử lý yêu cầu
+                        break;
                     case "EXIT":
                         running = false;
                 }
@@ -85,6 +90,24 @@ public class Client implements Runnable {
             Logger.getLogger(Client.class.getName()).log(Level.SEVERE, null, ex);
         }
 
+    }
+    private void onRequestUserList() {
+        UserController userController = new UserController();
+        List<UserModel> users = userController.getAllUsers(); 
+
+        // Tạo chuỗi kết quả để gửi lại cho client
+        StringBuilder userList = new StringBuilder("USER_LIST;");
+        for (UserModel user : users) {
+            userList.append(user.getId()).append(";")
+                    .append(user.getUsername()).append(";")
+                    .append(user.getFullName()).append(";")
+                    .append(user.getTotalScore()).append(";"); // Có thể thay đổi thông tin gửi đi nếu cần
+        }
+        
+        System.out.println("Gui yeu cau ve client");
+
+        // Gửi danh sách người dùng về client
+        sendData(userList.toString());
     }
     
     public void handleGameRequest(String request) {
@@ -125,11 +148,13 @@ public class Client implements Runnable {
 
         // check login
         String result = new UserController().login(username, password);
+        String[] parts = result.split(";"); // Phân tách chuỗi theo dấu ";"
 
         if (result.split(";")[0].equals("success")) {
             // set login user
             this.loginUser = username;
-            this.loginUserId = username;
+            this.loginUserId = parts[1];
+            System.out.println("id da login: " + loginUserId);
         }
 
         // send result
