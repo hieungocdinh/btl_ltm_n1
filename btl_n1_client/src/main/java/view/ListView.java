@@ -24,6 +24,7 @@ public class ListView extends javax.swing.JFrame {
     private JButton refreshButton;
     private JTable dataTable;
     private JScrollPane scrollPane;
+    private JButton inviteButton; // Thêm nút mời người chơi
 
 
     /**
@@ -59,6 +60,10 @@ public class ListView extends javax.swing.JFrame {
             // Xử lý sự kiện khi nhấn nút Refresh
             loadUserList();
         });
+        
+        // Tạo nút Invite Player
+        inviteButton = new JButton("Invite Player");
+        inviteButton.addActionListener(evt -> invitePlayer());
 
         // Sắp xếp layout
         GroupLayout layout = new GroupLayout(getContentPane());
@@ -72,6 +77,7 @@ public class ListView extends javax.swing.JFrame {
                 .addComponent(welcomeLabel)
                 .addComponent(scrollPane)
                 .addComponent(refreshButton)
+                .addComponent(inviteButton)
         );
 
         layout.setVerticalGroup(
@@ -79,12 +85,29 @@ public class ListView extends javax.swing.JFrame {
                 .addComponent(welcomeLabel)
                 .addComponent(scrollPane)
                 .addComponent(refreshButton)
+                .addComponent(inviteButton)
         );
 
         pack();
         
         
     }
+    
+    private void invitePlayer() {
+        int selectedRow = dataTable.getSelectedRow(); // Lấy dòng được chọn trong bảng
+        if (selectedRow != -1) {
+            String selectedUserId = dataTable.getValueAt(selectedRow, 0).toString(); // Lấy ID của người dùng được chọn
+            String selectedUsername = dataTable.getValueAt(selectedRow, 1).toString(); // Lấy tên người dùng được chọn
+
+            // Gửi yêu cầu mời người chơi lên server
+            ClientRun.socketHandler.invitePlayer(selectedUserId);
+
+            JOptionPane.showMessageDialog(this, "Đã gửi lời mời tới " + selectedUsername);
+        } else {
+            JOptionPane.showMessageDialog(this, "Vui lòng chọn người chơi để mời!");
+        }
+    }
+
     
     public void updateUserList(Object[][] userData) {
         // Cập nhật dữ liệu trong JTable

@@ -70,6 +70,9 @@ public class Client implements Runnable {
                     case "GET_USERS": // Thêm trường hợp này
                         onRequestUserList(); // Gọi phương thức xử lý yêu cầu
                         break;
+                    case "CREATE_GAME":  // Xử lý yêu cầu tạo game session
+                        onRequestCreateGame(received);
+                        break;
                     case "EXIT":
                         running = false;
                 }
@@ -94,6 +97,29 @@ public class Client implements Runnable {
         }
 
     }
+    
+    private void onRequestCreateGame(String received) {
+        // CREATE_GAME:userId1;userId2
+        // Phân tích cú pháp yêu cầu
+        String[] parts = received.split(";");
+        if (parts.length < 3) return;
+
+        String player1Id = parts[1]; // userId1
+        String player2Id = parts[2]; // userId2
+
+        // Tìm client theo id
+        Client player1 = ServerRun.clientManager.getClientById(player1Id);
+        Client player2 = ServerRun.clientManager.getClientById(player2Id);
+
+        // Kiểm tra nếu cả 2 người chơi đều có mặt
+        if (player1 != null && player2 != null) {
+            // Tạo game session
+            ServerRun.clientManager.createGameSession(player1, player2);
+        } else {
+            sendData("ERROR; One or both players not found.");
+        }
+    }
+    
     private void onRequestUserList() {
         UserController userController = new UserController();
         List<UserModel> users = userController.getAllUsers(); 

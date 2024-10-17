@@ -26,7 +26,7 @@ public class SocketHandler {
     DataInputStream dis;
     DataOutputStream dos;
 
-    String loginUser = null; // lưu tài khoản đăng nhập hiện tại
+    String loginUserId = null; // lưu tài khoản đăng nhập hiện tại
     float score = 0;
 
     Thread listener = null;
@@ -120,7 +120,13 @@ public class SocketHandler {
         // Gọi phương thức để hiển thị câu hỏi trong MatchView
         ClientRun.matchView.displayQuestion(questionId, questionText, imageLink);
     }
-
+    
+    public void invitePlayer(String player2Id) {
+        // Gửi yêu cầu mời người chơi đến server
+        String data = "CREATE_GAME;" + loginUserId + ";" + player2Id;
+        sendData(data);
+    }
+    
     public void login(String email, String password) {
         // prepare data
         String data = "LOGIN" + ";" + email + ";" + password;
@@ -189,9 +195,9 @@ public class SocketHandler {
             JOptionPane.showMessageDialog(null, "Login failed: " + splitted[2], "Error", JOptionPane.ERROR_MESSAGE);
         } else if (status.equals("success")) {
             // Lưu user login
-            this.loginUser = splitted[2];
+            this.loginUserId = splitted[2];
             this.score = Float.parseFloat(splitted[4]);
-            System.out.println("Id user vua dang nhap: " + this.loginUser);
+            System.out.println("Id user vua dang nhap: " + this.loginUserId);
 
             // Mở trang ListView và đóng trang đăng nhập
             ClientRun.openScene(ClientRun.SceneName.LIST);
