@@ -39,7 +39,7 @@ public class ListView extends javax.swing.JFrame {
     
     private void initCustomComponents() {
         // Tạo các thành phần giao diện
-        welcomeLabel = new JLabel("Welcome to List View");
+        welcomeLabel = new JLabel("Hello, <Undefined>");
         welcomeLabel.setHorizontalAlignment(SwingConstants.CENTER);
         welcomeLabel.setFont(new java.awt.Font("Segoe UI", java.awt.Font.BOLD, 18));
         
@@ -120,6 +120,12 @@ public class ListView extends javax.swing.JFrame {
     public void loadUserList() {
         // Gọi yêu cầu lấy danh sách người dùng từ socketHandler
         ClientRun.socketHandler.requestUserList();
+    }
+    
+    public void loadUserName(){
+        // Lấy username để hiển thị
+        String username = ClientRun.socketHandler.getLoginUsername();
+        welcomeLabel.setText("Hello, "+username+" !");
     }
 
 

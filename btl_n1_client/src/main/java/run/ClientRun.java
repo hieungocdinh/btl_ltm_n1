@@ -71,6 +71,7 @@ public class ClientRun {
                     if (listView == null) {
                         listView = new ListView();
                     }
+                    listView.loadUserName();
                     listView.loadUserList();
                     listView.setVisible(true);
                     break;

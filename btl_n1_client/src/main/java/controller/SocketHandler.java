@@ -27,6 +27,7 @@ public class SocketHandler {
     DataOutputStream dos;
 
     String loginUserId = null; // lưu tài khoản đăng nhập hiện tại
+    String loginUsername = null; // lưu tên tài khoản đăng nhập hiện tại
     float score = 0;
 
     Thread listener = null;
@@ -167,6 +168,11 @@ public class SocketHandler {
         String data = "GET_USERS"; // Một loại yêu cầu để nhận danh sách người dùng
         sendData(data);
     }
+    
+    // Lấy username cho trang List View
+    public String getLoginUsername() {
+        return this.loginUsername;
+    }
 
     /**
      * *
@@ -196,6 +202,7 @@ public class SocketHandler {
         } else if (status.equals("success")) {
             // Lưu user login
             this.loginUserId = splitted[2];
+            this.loginUsername = splitted[3];
             this.score = Float.parseFloat(splitted[4]);
             System.out.println("Id user vua dang nhap: " + this.loginUserId);
 
