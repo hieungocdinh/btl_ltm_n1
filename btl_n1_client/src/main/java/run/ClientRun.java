@@ -77,10 +77,8 @@ public class ClientRun {
                 case MATCH:
                     if (matchView == null) {
                         matchView = new MatchView();
-                        System.out.println("Tao moi scene run");
                     }
                     matchView.setVisible(true);
-                    System.out.println("Tao moi");
                     break;
 
                 default:

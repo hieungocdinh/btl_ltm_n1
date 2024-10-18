@@ -46,9 +46,9 @@ public class ListView extends javax.swing.JFrame {
         // Tạo bảng dữ liệu mẫu
         String[] columnNames = {"ID", "Username", "Full Name", "Score"}; // Cập nhật tiêu đề cột
         Object[][] data = {
-            {1, "johndoe", "John Doe", 85.0},
-            {2, "janesmith", "Jane Smith", 90.5},
-            {3, "alicejohnson", "Alice Johnson", 78.5},
+//            {1, "johndoe", "John Doe", 85.0},
+//            {2, "janesmith", "Jane Smith", 90.5},
+//            {3, "alicejohnson", "Alice Johnson", 78.5},
         };
         
         dataTable = new JTable(data, columnNames);
@@ -101,8 +101,6 @@ public class ListView extends javax.swing.JFrame {
 
             // Gửi yêu cầu mời người chơi lên server
             ClientRun.socketHandler.invitePlayer(selectedUserId);
-
-            JOptionPane.showMessageDialog(this, "Đã gửi lời mời tới " + selectedUsername);
         } else {
             JOptionPane.showMessageDialog(this, "Vui lòng chọn người chơi để mời!");
         }
