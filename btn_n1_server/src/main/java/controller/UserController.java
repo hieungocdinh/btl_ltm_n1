@@ -77,14 +77,18 @@ public class UserController {
     }
     
     public void updateScore(String userId, float score) {
-//        String sql = "UPDATE users SET total_score = total_score + ? WHERE id = ?";
-//        try (PreparedStatement stmt = con.prepareStatement(sql)) {
-//            stmt.setFloat(1, score);
-//            stmt.setInt(2, userId);
-//            stmt.executeUpdate();
-//        } catch (SQLException e) {
-//            e.printStackTrace();
-//        }
+        String sql = "UPDATE users SET total_score = total_score + ? WHERE id = ?";
+        
+        try (PreparedStatement stmt = con.prepareStatement(sql)) {
+            // Thiết lập các tham số cho câu truy vấn
+            stmt.setFloat(1, score);
+            stmt.setString(2, userId);
+
+            // Thực thi truy vấn
+            stmt.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
     }
     
     public List<UserModel> getAllUsers() {

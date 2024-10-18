@@ -4,6 +4,10 @@ import java.awt.Image;
 import java.net.URL;
 import javax.swing.ImageIcon;
 import javax.swing.JLabel;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import javax.swing.JOptionPane;
+import run.ClientRun;
 
 /**
  *
@@ -12,17 +16,92 @@ import javax.swing.JLabel;
 public class MatchView extends javax.swing.JFrame {
 
     private JLabel imageLabel;
+    
+    private int currentQuestion = 1;
+    private int correctAnswers = 0; // Đếm số câu trả lời đúng
 
     /**
      * Creates new form MatchView
      */
     public MatchView() {
         initComponents();
+        
+        jButton2.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                sendAnswer();
+            }
+        });
+    }
+    
+    public void showEndGameMessage() {
+        // Ẩn tất cả các thành phần
+        jPanel1.setVisible(false);
+        jPanel2.setVisible(false);
+        jLabel1.setVisible(false);
+        jLabel2.setVisible(false);
+        jLabel4.setVisible(false);
+
+        // Tạo JLabel để hiển thị thông báo kết thúc game
+        JLabel endGameMessage = new JLabel("Bạn đã hoàn thành 3 câu hỏi", JLabel.CENTER);
+        endGameMessage.setFont(new java.awt.Font("Segoe UI", 1, 24)); // Thiết lập font lớn
+        endGameMessage.setHorizontalAlignment(JLabel.CENTER); // Căn giữa
+        endGameMessage.setVerticalAlignment(JLabel.CENTER);   // Căn giữa theo chiều dọc
+
+        // Thêm thông báo vào giao diện chính
+        this.setLayout(new java.awt.BorderLayout()); // Sử dụng BorderLayout để căn giữa
+        this.add(endGameMessage, java.awt.BorderLayout.CENTER);
+
+        // Cập nhật giao diện
+        this.revalidate();
+        this.repaint();
+    }
+    
+    public void resetGameView() {
+        // Hiển thị lại các thành phần giao diện
+        jPanel1.setVisible(true);
+        jPanel2.setVisible(true);
+        jLabel1.setVisible(true);
+        jLabel2.setVisible(true);
+        jLabel4.setVisible(true);
+
+        // Loại bỏ thông báo kết thúc game (nếu có)
+        this.getContentPane().removeAll(); // Xóa toàn bộ nội dung
+        this.setLayout(new javax.swing.GroupLayout(getContentPane())); // Khôi phục lại Layout ban đầu
+        this.add(jPanel1);
+        this.add(jPanel2);
+        this.add(jLabel1);
+        this.add(jLabel2);
+        this.add(jLabel4);
+
+        // Reset lại các giá trị giao diện
+        jLabel1.setText("Câu hỏi thứ: " + currentQuestion);
+        jLabel2.setText("Số câu trả lời đúng: " + correctAnswers);
+        jLabel4.setText("Câu hỏi sẽ được hiển thị tại đây");
+
+        // Cập nhật lại giao diện
+        this.revalidate();
+        this.repaint();
+    }
+    
+    public void resetLocalResult() {
+        correctAnswers = 0;
+        currentQuestion = 1;
+    }
+    
+    public void increaseCorrectAnswers() {
+        correctAnswers++;
+    }
+    
+    public void increaseCurrentQuestion() {
+        currentQuestion++;
     }
 
     public void displayQuestion(int questionId, String questionText, String imageLink) {
         // Hiển thị câu hỏi
         jLabel4.setText(questionText);
+        jLabel1.setText("Câu hỏi thứ: " + currentQuestion);
+        jLabel2.setText("Số câu trả lời đúng: " + correctAnswers);
 
         // Hiển thị hình ảnh nếu có 
         loadImage(imageLink);
@@ -53,6 +132,20 @@ public class MatchView extends javax.swing.JFrame {
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+    
+    private void sendAnswer() {
+        String answer = jTextField3.getText(); // Lấy đáp án từ người dùng nhập vào
+        if (answer.trim().isEmpty()) {
+            JOptionPane.showMessageDialog(this, "Vui lòng nhập đáp án trước khi gửi!");
+            return;
+        }
+
+        // Gửi đáp án qua SocketHandler
+        ClientRun.socketHandler.sendAnswer(answer);
+
+        // Xóa trường nhập sau khi gửi
+        jTextField3.setText("");
     }
 
     /**
@@ -193,8 +286,8 @@ public class MatchView extends javax.swing.JFrame {
         //</editor-fold>
 
         // Tạo một instance của MatchView và hiển thị giao diện
-        MatchView matchView = new MatchView();
-        matchView.setVisible(true);
+//        MatchView matchView = new MatchView();
+//        matchView.setVisible(true);
 
         // Giả lập hiển thị một câu hỏi và link hình ảnh từ mạng
 //        String questionText = "Đây là câu hỏi ví dụ";

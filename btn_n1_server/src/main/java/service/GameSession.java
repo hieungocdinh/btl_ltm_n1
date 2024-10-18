@@ -15,6 +15,8 @@ public class GameSession {
     private int currentRound2;
     private int currentQuestionId1;
     private int currentQuestionId2;
+    private boolean player1EndGame;
+    private boolean player2EndGame;
     private boolean isFinished;
 
     public GameSession(Client player1, Client player2) {
@@ -25,6 +27,9 @@ public class GameSession {
         this.currentRound1 = 0;
         this.currentRound2 = 0;
         this.isFinished = false;
+        
+        this.player1EndGame = false;
+        this.player2EndGame = false;
     }
     
     public Client getPlayer1() {
@@ -48,7 +53,7 @@ public class GameSession {
             currentRound1++;
 
             // Tạo thông điệp chứa nội dung câu hỏi và đường dẫn hình ảnh
-            String questionMessage = "QUESTION;" + question.getQuestionText() + ";" + question.getImageLink();
+            String questionMessage = "QUESTION;" + question.getId() + ";" + question.getQuestionText() + ";" + question.getImageLink();
 
             // Gửi câu hỏi đến người chơi cụ thể
             player1.sendData(questionMessage);
@@ -71,7 +76,7 @@ public class GameSession {
             currentRound2++;
 
             // Tạo thông điệp chứa nội dung câu hỏi và đường dẫn hình ảnh
-            String questionMessage = "QUESTION;" + question.getQuestionText() + ";" + question.getImageLink();
+            String questionMessage = "QUESTION;" + question.getId() + ";" + question.getQuestionText() + ";" + question.getImageLink();
 
             // Gửi câu hỏi đến người chơi cụ thể
             player2.sendData(questionMessage);
@@ -104,15 +109,24 @@ public class GameSession {
         Client respondingClient = playerId.equals(player1.getLoginUserId()) ? player1 : player2;
         respondingClient.sendData(isCorrect ? "CORRECT" : "WRONG");
 
-        // Kiểm tra nếu trò chơi đã kết thúc
         if (isGameOver()) {
             endGame();
         } else {
             // Tiếp tục gửi câu hỏi tiếp theo cho người chơi
-            if (playerId.equals(player1.getLoginUserId())) {
+            if (playerId.equals(player1.getLoginUserId()) && currentRound1 < 3) {
                 sendNextQuestionToPlayer1();
-            } else if (playerId.equals(player2.getLoginUserId())) {
+            } else if (playerId.equals(player1.getLoginUserId()) && currentRound1 == 3) {
+                player1.sendData("WAIT_END_GAME");
+                player1EndGame = true;
+            } else if (playerId.equals(player2.getLoginUserId()) && currentRound2 < 3) {
                 sendNextQuestionToPlayer2();
+            } else if (playerId.equals(player2.getLoginUserId()) && currentRound2 == 3) {
+                player2.sendData("WAIT_END_GAME");
+                player2EndGame = true;
+            }
+
+            if (isGameOver()) {
+                endGame();
             }
         }
     }
@@ -123,7 +137,7 @@ public class GameSession {
             return true;
         }
         // Hoặc nếu cả hai người chơi đã hoàn thành 3 câu hỏi
-        if (currentRound1 == 3 && currentRound2 == 3) {
+        if (player1EndGame == true && player2EndGame == true) {
             return true;
         }
         return false;
@@ -138,14 +152,14 @@ public class GameSession {
         String player1Id = player1.getLoginUserId();
         String player2Id = player2.getLoginUserId();
 
-        if (player1Score > player2Score) {
+        if (player1Score >= 2 && player1Score > player2Score) {
             result = "USER1";
             player1.sendData("WIN;You won the game!");
             player2.sendData("LOSE;You lost the game.");
 
             // Cập nhật điểm số cho người thắng và người thua
             userController.updateScore(player1Id, 1);
-        } else if (player2Score > player1Score) {
+        } else if (player2Score >= 2 && player2Score > player1Score) {
             result = "USER2";
             player2.sendData("WIN;You won the game!");
             player1.sendData("LOSE;You lost the game.");
