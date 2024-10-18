@@ -88,6 +88,18 @@ public class SocketHandler {
                     case "QUESTION":
                         onReceiveQuestion(received);  // Xử lý câu hỏi
                         break;
+                    case "CORRECT":
+                    case "WRONG":
+                        onReceiveAnswerResult(received);
+                        break;
+                    case "WIN":
+                    case "LOSE":
+                    case "DRAW":
+                        onReceiveGameResult(received);  // Xử lý kết quả thắng/thua
+                        break;
+                    case "WAIT_END_GAME":
+                        ClientRun.matchView.showEndGameMessage();
+                        break;
                     case "ERROR":
                         // Handle error
                         break;
@@ -125,6 +137,39 @@ public class SocketHandler {
 
         // Gọi phương thức để hiển thị câu hỏi trong MatchView
         ClientRun.matchView.displayQuestion(questionId, questionText, imageLink);
+        ClientRun.matchView.increaseCurrentQuestion();
+    }
+    
+    public void sendAnswer(String answer) {
+        String data = "ANSWER;" + answer;
+        sendData(data);
+    }
+
+    private void onReceiveAnswerResult(String received) {
+        if (received.equals("CORRECT")) {
+            JOptionPane.showMessageDialog(ClientRun.matchView, "Bạn trả lời đúng, bạn có thêm 1 điểm!");
+            ClientRun.matchView.increaseCorrectAnswers();
+        } else {
+            JOptionPane.showMessageDialog(ClientRun.matchView, "Bạn trả lời sai!");
+        }
+    }
+    
+    private void onReceiveGameResult(String received) {
+        String type = received.split(";")[0];
+
+        if (type.equals("WIN")) {
+            JOptionPane.showMessageDialog(ClientRun.matchView, "Chúc mừng! Bạn đã thắng!", "Kết quả", JOptionPane.INFORMATION_MESSAGE);
+        } else if (type.equals("LOSE")) {
+            JOptionPane.showMessageDialog(ClientRun.matchView, "Rất tiếc! Bạn đã thua!", "Kết quả", JOptionPane.INFORMATION_MESSAGE);
+        } else if (type.equals("DRAW")) {
+            JOptionPane.showMessageDialog(ClientRun.matchView, "Trận đấu kết thúc với tỉ số hòa!", "Kết quả", JOptionPane.INFORMATION_MESSAGE);
+        }
+
+        // Quay về màn hình danh sách người chơi
+        ClientRun.matchView.resetLocalResult();
+        ClientRun.matchView.resetGameView();
+        ClientRun.openScene(ClientRun.SceneName.LIST);
+        ClientRun.closeScene(ClientRun.SceneName.MATCH);
     }
     
     public void invitePlayer(String player2Id) {
