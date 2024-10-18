@@ -10,6 +10,8 @@ import java.io.IOException;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.Socket;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JOptionPane;
@@ -196,15 +198,27 @@ public class SocketHandler {
     private void onReceiveUserList(String received) {
         String[] splitted = received.split(";");
         if (splitted.length > 1) {
-            // Tạo một mảng để chứa danh sách người dùng
-            Object[][] userData = new Object[(splitted.length - 1) / 4][4]; // Mỗi người dùng có 4 phần (ID, Username, Full Name, Score)
+            // Tạo danh sách để chứa người dùng
+            List<Object[]> filteredUserList = new ArrayList<>();
 
             for (int i = 1; i < splitted.length; i += 4) {
-                userData[(i - 1) / 4][0] = splitted[i];     // ID
-                userData[(i - 1) / 4][1] = splitted[i + 1]; // Username
-                userData[(i - 1) / 4][2] = splitted[i + 2]; // Full Name
-                userData[(i - 1) / 4][3] = splitted[i + 3]; // Score
+                String userId = splitted[i]; // ID của người dùng
+
+                // Kiểm tra xem ID có trùng với người dùng hiện tại không
+                if (!userId.equals(this.loginUserId)) {
+                    // Thêm thông tin người dùng vào danh sách nếu không phải chính mình
+                    Object[] user = new Object[4];
+                    user[0] = userId;     // ID
+                    user[1] = splitted[i + 1]; // Username
+                    user[2] = splitted[i + 2]; // Full Name
+                    user[3] = splitted[i + 3]; // Score
+
+                    filteredUserList.add(user);
+                }
             }
+
+            // Chuyển danh sách người dùng thành mảng 2 chiều
+            Object[][] userData = filteredUserList.toArray(new Object[0][]);
 
             // Cập nhật dữ liệu trong ListView
             ClientRun.listView.updateUserList(userData);
