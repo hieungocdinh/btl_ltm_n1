@@ -74,6 +74,15 @@ public class ClientRun {
                     listView.loadUserList();
                     listView.setVisible(true);
                     break;
+                case MATCH:
+                    if (matchView == null) {
+                        matchView = new MatchView();
+                        System.out.println("Tao moi scene run");
+                    }
+                    matchView.setVisible(true);
+                    System.out.println("Tao moi");
+                    break;
+
                 default:
                     break;
             }
@@ -91,6 +100,9 @@ public class ClientRun {
                     break;
                 case LIST:
                     listView.dispose();
+                    break;
+                case MATCH:
+                    matchView.dispose();
                     break;
                 default:
                     break;

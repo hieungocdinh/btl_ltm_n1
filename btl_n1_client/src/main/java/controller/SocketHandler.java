@@ -84,6 +84,7 @@ public class SocketHandler {
                         break;
                     case "USER_LIST":
                         onReceiveUserList(received); // Xử lý danh sách người dùng
+                        break;
                     case "QUESTION":
                         onReceiveQuestion(received);  // Xử lý câu hỏi
                         break;
@@ -116,9 +117,16 @@ public class SocketHandler {
         int questionId = Integer.parseInt(parts[1]);  // Lấy id câu hỏi
         String questionText = parts[2];  // Nội dung câu hỏi
         String imageLink = parts[3];  // Đường dẫn hình ảnh
+        
+//        System.out.println("match view: " + ClientRun.matchView);
+        
+//        if (ClientRun.matchView == null) {
+            ClientRun.openScene(ClientRun.SceneName.MATCH);
+            System.out.println("Tao moi scene");
+//        }
 
         // Gọi phương thức để hiển thị câu hỏi trong MatchView
-        ClientRun.matchView.displayQuestion(questionId, questionText, imageLink);
+//        ClientRun.matchView.displayQuestion(questionId, questionText, imageLink);
     }
     
     public void invitePlayer(String player2Id) {
