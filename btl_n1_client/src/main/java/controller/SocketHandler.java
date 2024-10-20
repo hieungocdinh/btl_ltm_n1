@@ -10,6 +10,8 @@ import java.io.IOException;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.Socket;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JOptionPane;
@@ -85,8 +87,21 @@ public class SocketHandler {
                         break;
                     case "USER_LIST":
                         onReceiveUserList(received); // Xử lý danh sách người dùng
+                        break;
                     case "QUESTION":
                         onReceiveQuestion(received);  // Xử lý câu hỏi
+                        break;
+                    case "CORRECT":
+                    case "WRONG":
+                        onReceiveAnswerResult(received);
+                        break;
+                    case "WIN":
+                    case "LOSE":
+                    case "DRAW":
+                        onReceiveGameResult(received);  // Xử lý kết quả thắng/thua
+                        break;
+                    case "WAIT_END_GAME":
+                        ClientRun.matchView.showEndGameMessage();
                         break;
                     case "ERROR":
                         // Handle error
@@ -117,9 +132,47 @@ public class SocketHandler {
         int questionId = Integer.parseInt(parts[1]);  // Lấy id câu hỏi
         String questionText = parts[2];  // Nội dung câu hỏi
         String imageLink = parts[3];  // Đường dẫn hình ảnh
+        
+        if (ClientRun.matchView.isVisible() == false) {
+            ClientRun.openScene(ClientRun.SceneName.MATCH);
+            ClientRun.closeScene(ClientRun.SceneName.LIST);
+        }
 
         // Gọi phương thức để hiển thị câu hỏi trong MatchView
         ClientRun.matchView.displayQuestion(questionId, questionText, imageLink);
+        ClientRun.matchView.increaseCurrentQuestion();
+    }
+    
+    public void sendAnswer(String answer) {
+        String data = "ANSWER;" + answer;
+        sendData(data);
+    }
+
+    private void onReceiveAnswerResult(String received) {
+        if (received.equals("CORRECT")) {
+            JOptionPane.showMessageDialog(ClientRun.matchView, "Bạn trả lời đúng, bạn có thêm 1 điểm!");
+            ClientRun.matchView.increaseCorrectAnswers();
+        } else {
+            JOptionPane.showMessageDialog(ClientRun.matchView, "Bạn trả lời sai!");
+        }
+    }
+    
+    private void onReceiveGameResult(String received) {
+        String type = received.split(";")[0];
+
+        if (type.equals("WIN")) {
+            JOptionPane.showMessageDialog(ClientRun.matchView, "Chúc mừng! Bạn đã thắng!", "Kết quả", JOptionPane.INFORMATION_MESSAGE);
+        } else if (type.equals("LOSE")) {
+            JOptionPane.showMessageDialog(ClientRun.matchView, "Rất tiếc! Bạn đã thua!", "Kết quả", JOptionPane.INFORMATION_MESSAGE);
+        } else if (type.equals("DRAW")) {
+            JOptionPane.showMessageDialog(ClientRun.matchView, "Trận đấu kết thúc với tỉ số hòa!", "Kết quả", JOptionPane.INFORMATION_MESSAGE);
+        }
+
+        // Quay về màn hình danh sách người chơi
+        ClientRun.matchView.resetLocalResult();
+        ClientRun.matchView.resetGameView();
+        ClientRun.openScene(ClientRun.SceneName.LIST);
+        ClientRun.closeScene(ClientRun.SceneName.MATCH);
     }
     
     public void invitePlayer(String player2Id) {
@@ -146,15 +199,27 @@ public class SocketHandler {
     private void onReceiveUserList(String received) {
         String[] splitted = received.split(";");
         if (splitted.length > 1) {
-            // Tạo một mảng để chứa danh sách người dùng
-            Object[][] userData = new Object[(splitted.length - 1) / 4][4]; // Mỗi người dùng có 4 phần (ID, Username, Full Name, Score)
+            // Tạo danh sách để chứa người dùng
+            List<Object[]> filteredUserList = new ArrayList<>();
 
             for (int i = 1; i < splitted.length; i += 4) {
-                userData[(i - 1) / 4][0] = splitted[i];     // ID
-                userData[(i - 1) / 4][1] = splitted[i + 1]; // Username
-                userData[(i - 1) / 4][2] = splitted[i + 2]; // Full Name
-                userData[(i - 1) / 4][3] = splitted[i + 3]; // Score
+                String userId = splitted[i]; // ID của người dùng
+
+                // Kiểm tra xem ID có trùng với người dùng hiện tại không
+                if (!userId.equals(this.loginUserId)) {
+                    // Thêm thông tin người dùng vào danh sách nếu không phải chính mình
+                    Object[] user = new Object[4];
+                    user[0] = userId;     // ID
+                    user[1] = splitted[i + 1]; // Username
+                    user[2] = splitted[i + 2]; // Full Name
+                    user[3] = splitted[i + 3]; // Score
+
+                    filteredUserList.add(user);
+                }
             }
+
+            // Chuyển danh sách người dùng thành mảng 2 chiều
+            Object[][] userData = filteredUserList.toArray(new Object[0][]);
 
             // Cập nhật dữ liệu trong ListView
             ClientRun.listView.updateUserList(userData);
