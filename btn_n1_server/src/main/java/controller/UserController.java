@@ -39,12 +39,16 @@ public class UserController {
             if (r.next()) {
                 return "failed;" + "User Already Exit";
             } else {
+                //Packing
+                UserModel user = new UserModel(username, fullName, password);
+                
+                //Register User
                 r.close();
                 p.close();
                 p = con.prepareStatement(INSERT_USER);
-                p.setString(1, username);
-                p.setString(2, password);
-                p.setString(3, fullName);
+                p.setString(1, user.getUsername());
+                p.setString(2, user.getPassword());
+                p.setString(3, user.getFullName());
                 p.executeUpdate();
                 p.close();
             }
@@ -57,10 +61,13 @@ public class UserController {
     public String login(String username, String password) {
         //  Check user exit
         try {
+            //Packing
+            UserModel user = new UserModel(username, password);
+            
             PreparedStatement p = con.prepareStatement(LOGIN_USER);
             //  Login User 
-            p.setString(1, username);
-            p.setString(2, password);
+            p.setString(1, user.getUsername());
+            p.setString(2, user.getPassword());
             ResultSet r = p.executeQuery();
 
             if (r.next()) {
