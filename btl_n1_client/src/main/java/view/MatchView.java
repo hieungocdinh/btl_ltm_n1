@@ -135,7 +135,7 @@ public class MatchView extends javax.swing.JFrame {
     }
     
     private void sendAnswer() {
-        String answer = jTextField3.getText(); // Lấy đáp án từ người dùng nhập vào
+        String answer = jTextField3.getText().toUpperCase(); // Lấy đáp án từ người dùng nhập vào
         if (answer.trim().isEmpty()) {
             JOptionPane.showMessageDialog(this, "Vui lòng nhập đáp án trước khi gửi!");
             return;
