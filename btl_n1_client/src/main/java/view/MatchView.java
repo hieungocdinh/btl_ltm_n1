@@ -291,7 +291,7 @@ public class MatchView extends javax.swing.JFrame {
 
         // Giả lập hiển thị một câu hỏi và link hình ảnh từ mạng
 //        String questionText = "Đây là câu hỏi ví dụ";
-//        String imageLink = "https://upload.wikimedia.org/wikipedia/commons/4/47/PNG_transparency_demonstration_1.png"; // Link ảnh hợp lệ
+//        String imageLink = "https://petdanphuong.com.vn/wp-content/uploads/2022/01/0e65088d0093cbf1e22295f07b112411.jpg"; // Link ảnh hợp lệ
 //
 //        // Gọi phương thức displayQuestion để hiển thị câu hỏi
 //        matchView.displayQuestion(1, questionText, imageLink);

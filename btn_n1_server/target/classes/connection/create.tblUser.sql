@@ -12,6 +12,6 @@ CREATE TABLE `btlltm`.`users` (
   `username` VARCHAR(50) NOT NULL,
   `password` VARCHAR(50) NOT NULL,
   `full_name` VARCHAR(50) NOT NULL,
-  `total_score` INT NOT NULL,
+  `total_score` FLOAT NOT NULL,
   PRIMARY KEY (`id`)
 );
