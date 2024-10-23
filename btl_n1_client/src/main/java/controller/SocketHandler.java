@@ -140,14 +140,8 @@ public class SocketHandler {
         }
 
         // Gọi phương thức để hiển thị câu hỏi trong MatchView
-        if (imageLink != null && !imageLink.isEmpty()) {
-            System.out.println("Loading image from: " + imageLink);
-            // Gọi phương thức hiển thị hình ảnh nếu đường dẫn hợp lệ
-            ClientRun.matchView.displayQuestion(questionId, questionText, imageLink);
-        } else {
-            System.out.println("No image available for this question.");
-            ClientRun.matchView.displayQuestion(questionId, questionText, null);
-        }
+        ClientRun.matchView.displayQuestion(questionId, questionText, imageLink);
+        ClientRun.matchView.increaseCurrentQuestion();
     }
 
     public void sendAnswer(String answer) {
