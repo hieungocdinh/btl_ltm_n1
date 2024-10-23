@@ -39,18 +39,11 @@ public class MatchView extends javax.swing.JFrame {
         jPanel1.setVisible(false);
         jPanel2.setVisible(false);
         jLabel1.setVisible(false);
-        jLabel2.setVisible(false);
+//        jLabel2.setVisible(false);
         jLabel4.setVisible(false);
 
-        // Tạo JLabel để hiển thị thông báo kết thúc game
-        JLabel endGameMessage = new JLabel("Bạn đã hoàn thành 3 câu hỏi", JLabel.CENTER);
-        endGameMessage.setFont(new java.awt.Font("Segoe UI", 1, 24)); // Thiết lập font lớn
-        endGameMessage.setHorizontalAlignment(JLabel.CENTER); // Căn giữa
-        endGameMessage.setVerticalAlignment(JLabel.CENTER);   // Căn giữa theo chiều dọc
-
-        // Thêm thông báo vào giao diện chính
-        this.setLayout(new java.awt.BorderLayout()); // Sử dụng BorderLayout để căn giữa
-        this.add(endGameMessage, java.awt.BorderLayout.CENTER);
+        // Khi trả lời hết 3 câu hỏi, sửa text của jLabel2 thành "Bạn đã trả lời hết 3 câu hỏi"
+        jLabel2.setText("Bạn đã trả lời hết 3 câu hỏi");
 
         // Cập nhật giao diện
         this.revalidate();
@@ -64,15 +57,6 @@ public class MatchView extends javax.swing.JFrame {
         jLabel1.setVisible(true);
         jLabel2.setVisible(true);
         jLabel4.setVisible(true);
-
-        // Loại bỏ thông báo kết thúc game (nếu có)
-        this.getContentPane().removeAll(); // Xóa toàn bộ nội dung
-        this.setLayout(new javax.swing.GroupLayout(getContentPane())); // Khôi phục lại Layout ban đầu
-        this.add(jPanel1);
-        this.add(jPanel2);
-        this.add(jLabel1);
-        this.add(jLabel2);
-        this.add(jLabel4);
 
         // Reset lại các giá trị giao diện
         jLabel1.setText("Câu hỏi thứ: " + currentQuestion);
@@ -113,19 +97,15 @@ public class MatchView extends javax.swing.JFrame {
             ImageIcon imageIcon = new ImageIcon(url);
             Image image = imageIcon.getImage(); // Lấy Image từ ImageIcon
 
-            // Lấy chiều rộng và chiều cao của jPanel1
-            int panelWidth = jPanel1.getWidth();
-            int panelHeight = jPanel1.getHeight();
+            // Kiểm tra kích thước của jPanel1
+            int width = jPanel1.getWidth();
+            int height = jPanel1.getHeight();
 
-            // Kiểm tra nếu kích thước là 0 thì dùng kích thước mặc định
-            if (panelWidth == 0 || panelHeight == 0) {
-                panelWidth = 200; // giá trị mặc định nếu cần
-                panelHeight = 200;
+            // Nếu jPanel1 có kích thước hợp lệ, thay đổi kích thước ảnh
+            if (width > 0 && height > 0) {
+                Image scaledImage = image.getScaledInstance(width, height, Image.SCALE_SMOOTH); // Thay đổi kích thước ảnh theo kích thước jPanel1
+                imageIcon = new ImageIcon(scaledImage);
             }
-
-            // Thay đổi kích thước ảnh theo kích thước jPanel1
-            Image scaledImage = image.getScaledInstance(panelWidth, panelHeight, Image.SCALE_SMOOTH);
-            imageIcon = new ImageIcon(scaledImage);
 
             // Xóa tất cả thành phần cũ trong jPanel1 trước khi thêm ảnh mới
             jPanel1.removeAll();
