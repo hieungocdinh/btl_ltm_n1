@@ -6,7 +6,7 @@
  * Author:  hieun
  * Created: Oct 5, 2024
  */
-CREATE TABLE `btlltm`.`questions` (
+CREATE TABLE `btl_nhom1`.`questions` (
   `id` INT NOT NULL AUTO_INCREMENT,
   `questionText` TEXT NOT NULL,
   `imageLink` TEXT NOT NULL,

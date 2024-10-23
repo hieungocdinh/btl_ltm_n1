@@ -6,7 +6,7 @@
  * Author:  hieun
  * Created: Oct 5, 2024
  */
-CREATE TABLE `btlltm`.`results` (
+CREATE TABLE `btl_nhom1`.`results` (
   `id` INT NOT NULL AUTO_INCREMENT,
   `userId1` VARCHAR(20) NOT NULL,
   `userId2` VARCHAR(20) NOT NULL,
