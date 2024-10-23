@@ -97,12 +97,19 @@ public class Client implements Runnable {
         }
 
     }
-    
+
+    public boolean isConnected() {
+        // Kiểm tra xem Socket có còn kết nối hay không
+        return s != null && !s.isClosed() && s.isConnected();
+    }
+
     private void onRequestCreateGame(String received) {
         // CREATE_GAME:userId1;userId2
         // Phân tích cú pháp yêu cầu
         String[] parts = received.split(";");
-        if (parts.length < 3) return;
+        if (parts.length < 3) {
+            return;
+        }
 
         String player1Id = parts[1]; // userId1
         String player2Id = parts[2]; // userId2
@@ -119,10 +126,10 @@ public class Client implements Runnable {
             sendData("ERROR; One or both players not found.");
         }
     }
-    
+
     private void onRequestUserList() {
         UserController userController = new UserController();
-        List<UserModel> users = userController.getAllUsers(); 
+        List<UserModel> users = userController.getAllUsers();
 
         // Tạo chuỗi kết quả để gửi lại cho client
         StringBuilder userList = new StringBuilder("USER_LIST;");
@@ -132,17 +139,19 @@ public class Client implements Runnable {
                     .append(user.getFullName()).append(";")
                     .append(user.getTotalScore()).append(";"); // Có thể thay đổi thông tin gửi đi nếu cần
         }
-        
+
         System.out.println("Gui yeu cau ve client");
 
         // Gửi danh sách người dùng về client
         sendData(userList.toString());
     }
-    
+
     public void handleGameRequest(String request) {
         // Phân tích yêu cầu từ client, ví dụ "ANSWER;answer_text"
         String[] parts = request.split(";");
-        if (parts.length < 2) return;
+        if (parts.length < 2) {
+            return;
+        }
 
         String type = parts[0];
         String answer = parts[1];
@@ -189,8 +198,8 @@ public class Client implements Runnable {
         // send result
         sendData("LOGIN" + ";" + result);
     }
-    
-     private void onReceiveRegister(String received) {
+
+    private void onReceiveRegister(String received) {
         // get email / password from data
         String[] splitted = received.split(";");
         String username = splitted[1];
