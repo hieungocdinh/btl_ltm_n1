@@ -16,7 +16,7 @@ import run.ClientRun;
 public class MatchView extends javax.swing.JFrame {
 
     private JLabel imageLabel;
-    
+
     private int currentQuestion = 1;
     private int correctAnswers = 0; // Đếm số câu trả lời đúng
 
@@ -25,7 +25,7 @@ public class MatchView extends javax.swing.JFrame {
      */
     public MatchView() {
         initComponents();
-        
+
         jButton2.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -33,7 +33,7 @@ public class MatchView extends javax.swing.JFrame {
             }
         });
     }
-    
+
     public void showEndGameMessage() {
         // Ẩn tất cả các thành phần
         jPanel1.setVisible(false);
@@ -56,7 +56,7 @@ public class MatchView extends javax.swing.JFrame {
         this.revalidate();
         this.repaint();
     }
-    
+
     public void resetGameView() {
         // Hiển thị lại các thành phần giao diện
         jPanel1.setVisible(true);
@@ -83,16 +83,16 @@ public class MatchView extends javax.swing.JFrame {
         this.revalidate();
         this.repaint();
     }
-    
+
     public void resetLocalResult() {
         correctAnswers = 0;
         currentQuestion = 1;
     }
-    
+
     public void increaseCorrectAnswers() {
         correctAnswers++;
     }
-    
+
     public void increaseCurrentQuestion() {
         currentQuestion++;
     }
@@ -112,7 +112,19 @@ public class MatchView extends javax.swing.JFrame {
             URL url = new URL(imageUrl);  // Dùng URL nếu bạn lưu link ảnh từ web
             ImageIcon imageIcon = new ImageIcon(url);
             Image image = imageIcon.getImage(); // Lấy Image từ ImageIcon
-            Image scaledImage = image.getScaledInstance(jPanel1.getWidth(), jPanel1.getHeight(), Image.SCALE_SMOOTH); // Thay đổi kích thước ảnh theo kích thước jPanel1
+
+            // Lấy chiều rộng và chiều cao của jPanel1
+            int panelWidth = jPanel1.getWidth();
+            int panelHeight = jPanel1.getHeight();
+
+            // Kiểm tra nếu kích thước là 0 thì dùng kích thước mặc định
+            if (panelWidth == 0 || panelHeight == 0) {
+                panelWidth = 200; // giá trị mặc định nếu cần
+                panelHeight = 200;
+            }
+
+            // Thay đổi kích thước ảnh theo kích thước jPanel1
+            Image scaledImage = image.getScaledInstance(panelWidth, panelHeight, Image.SCALE_SMOOTH);
             imageIcon = new ImageIcon(scaledImage);
 
             // Xóa tất cả thành phần cũ trong jPanel1 trước khi thêm ảnh mới
@@ -133,7 +145,7 @@ public class MatchView extends javax.swing.JFrame {
             e.printStackTrace();
         }
     }
-    
+
     private void sendAnswer() {
         String answer = jTextField3.getText().toUpperCase(); // Lấy đáp án từ người dùng nhập vào
         if (answer.trim().isEmpty()) {

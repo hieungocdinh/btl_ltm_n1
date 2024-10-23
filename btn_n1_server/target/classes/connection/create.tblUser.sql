@@ -7,7 +7,7 @@
  * Created: Oct 5, 2024
  */
 
-CREATE TABLE `btlltm`.`users` (
+CREATE TABLE `btl_nhom1`.`users` (
   `id` INT NOT NULL AUTO_INCREMENT,
   `username` VARCHAR(50) NOT NULL,
   `password` VARCHAR(50) NOT NULL,
