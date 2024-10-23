@@ -196,11 +196,11 @@ public class GameSession {
             // Thông báo người chơi còn lại thắng
             if (player1.isConnected()) {
                 result = "USER1";
-                player1.sendData("WIN1;Your opponent has exited the game!");
+                player1.sendData("WIN;Your opponent has exited the game!");
                 userController.updateScore(player1Id, 1);
             } else {
                 result = "USER2";
-                player2.sendData("WIN1;Your opponent has exited the game!");
+                player2.sendData("WIN;Your opponent has exited the game!");
                 userController.updateScore(player2Id, 1);
             }
         } else {

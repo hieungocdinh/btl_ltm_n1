@@ -88,6 +88,12 @@ public class Client implements Runnable {
             this.dis.close();
             this.dos.close();
             System.out.println("- Client disconnected: " + s);
+            
+            // Check if the client was in a game session
+            GameSession session = ServerRun.clientManager.getGameSessionForPlayer(loginUserId);
+            if (session != null) {
+                session.endGame();  // End the game session if the client was involved
+            }
 
             // remove from clientManager
             ServerRun.clientManager.remove(this);

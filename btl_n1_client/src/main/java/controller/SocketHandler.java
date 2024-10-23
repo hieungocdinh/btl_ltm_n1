@@ -98,7 +98,7 @@ public class SocketHandler {
                     case "WIN":
                     case "LOSE":
                     case "DRAW":
-                    case "WIN1":
+//                    case "WIN1":
                         onReceiveGameResult(received);  // Xử lý kết quả thắng/thua
                         break;
                     case "WAIT_END_GAME":
@@ -160,9 +160,14 @@ public class SocketHandler {
     
     private void onReceiveGameResult(String received) {
         String type = received.split(";")[0];
+        String message = received.split(";")[1];
 
         if (type.equals("WIN")) {
-            JOptionPane.showMessageDialog(ClientRun.matchView, "Chúc mừng! Bạn đã thắng!", "Kết quả", JOptionPane.INFORMATION_MESSAGE);
+            if (message.equals("Your opponent has exited the game!")) {
+                JOptionPane.showMessageDialog(ClientRun.matchView, "Chúc mừng! Bạn đã thắng do đối thủ của bạn bỏ cuộc", "Kết quả", JOptionPane.INFORMATION_MESSAGE);
+            } else {
+                JOptionPane.showMessageDialog(ClientRun.matchView, "Chúc mừng! Bạn đã thắng!", "Kết quả", JOptionPane.INFORMATION_MESSAGE);
+            }
         } else if (type.equals("LOSE")) {
             JOptionPane.showMessageDialog(ClientRun.matchView, "Rất tiếc! Bạn đã thua!", "Kết quả", JOptionPane.INFORMATION_MESSAGE);
         } else if (type.equals("DRAW")) {
