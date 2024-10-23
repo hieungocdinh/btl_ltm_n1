@@ -133,17 +133,23 @@ public class SocketHandler {
         int questionId = Integer.parseInt(parts[1]);  // Lấy id câu hỏi
         String questionText = parts[2];  // Nội dung câu hỏi
         String imageLink = parts[3];  // Đường dẫn hình ảnh
-        
+
         if (ClientRun.matchView.isVisible() == false) {
             ClientRun.openScene(ClientRun.SceneName.MATCH);
             ClientRun.closeScene(ClientRun.SceneName.LIST);
         }
 
         // Gọi phương thức để hiển thị câu hỏi trong MatchView
-        ClientRun.matchView.displayQuestion(questionId, questionText, imageLink);
-        ClientRun.matchView.increaseCurrentQuestion();
+        if (imageLink != null && !imageLink.isEmpty()) {
+            System.out.println("Loading image from: " + imageLink);
+            // Gọi phương thức hiển thị hình ảnh nếu đường dẫn hợp lệ
+            ClientRun.matchView.displayQuestion(questionId, questionText, imageLink);
+        } else {
+            System.out.println("No image available for this question.");
+            ClientRun.matchView.displayQuestion(questionId, questionText, null);
+        }
     }
-    
+
     public void sendAnswer(String answer) {
         String data = "ANSWER;" + answer;
         sendData(data);
@@ -157,7 +163,7 @@ public class SocketHandler {
             JOptionPane.showMessageDialog(ClientRun.matchView, "Bạn trả lời sai!");
         }
     }
-    
+
     private void onReceiveGameResult(String received) {
         String type = received.split(";")[0];
 
@@ -167,7 +173,7 @@ public class SocketHandler {
             JOptionPane.showMessageDialog(ClientRun.matchView, "Rất tiếc! Bạn đã thua!", "Kết quả", JOptionPane.INFORMATION_MESSAGE);
         } else if (type.equals("DRAW")) {
             JOptionPane.showMessageDialog(ClientRun.matchView, "Trận đấu kết thúc với tỉ số hòa!", "Kết quả", JOptionPane.INFORMATION_MESSAGE);
-        }else if (type.equals("WIN1")) {
+        } else if (type.equals("WIN1")) {
             JOptionPane.showMessageDialog(ClientRun.matchView, "Bạn đã thắng! Đối thủ đã thoát trận!", "Kết quả", JOptionPane.INFORMATION_MESSAGE);
         }
 
@@ -177,13 +183,13 @@ public class SocketHandler {
         ClientRun.openScene(ClientRun.SceneName.LIST);
         ClientRun.closeScene(ClientRun.SceneName.MATCH);
     }
-    
+
     public void invitePlayer(String player2Id) {
         // Gửi yêu cầu mời người chơi đến server
         String data = "CREATE_GAME;" + loginUserId + ";" + player2Id;
         sendData(data);
     }
-    
+
     public void login(String email, String password) {
         // prepare data
         String data = "LOGIN" + ";" + email + ";" + password;
@@ -197,7 +203,7 @@ public class SocketHandler {
         // send data
         sendData(data);
     }
-    
+
     // Thêm phương thức xử lý danh sách người dùng
     private void onReceiveUserList(String received) {
         String[] splitted = received.split(";");
@@ -229,14 +235,13 @@ public class SocketHandler {
         }
     }
 
-    
     // Thêm vào SocketHandler
     public void requestUserList() {
         // Gửi yêu cầu đến máy chủ
         String data = "GET_USERS"; // Một loại yêu cầu để nhận danh sách người dùng
         sendData(data);
     }
-    
+
     // Lấy username cho trang List View
     public String getLoginUsername() {
         return this.loginUsername;
@@ -254,7 +259,7 @@ public class SocketHandler {
                     .getName()).log(Level.SEVERE, null, ex);
         }
     }
-    
+
     /**
      * *
      * Handle receive data from server

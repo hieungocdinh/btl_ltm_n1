@@ -288,10 +288,10 @@ public class MatchView extends javax.swing.JFrame {
         // Tạo một instance của MatchView và hiển thị giao diện
 //        MatchView matchView = new MatchView();
 //        matchView.setVisible(true);
-
-        // Giả lập hiển thị một câu hỏi và link hình ảnh từ mạng
+//
+//        // Giả lập hiển thị một câu hỏi và link hình ảnh từ mạng
 //        String questionText = "Đây là câu hỏi ví dụ";
-//        String imageLink = "https://petdanphuong.com.vn/wp-content/uploads/2022/01/0e65088d0093cbf1e22295f07b112411.jpg"; // Link ảnh hợp lệ
+//        String imageLink = "https://file1.dangcongsan.vn/data/0/images/2021/12/29/phuongdt/qdnd.jpg"; // Link ảnh hợp lệ
 //
 //        // Gọi phương thức displayQuestion để hiển thị câu hỏi
 //        matchView.displayQuestion(1, questionText, imageLink);
