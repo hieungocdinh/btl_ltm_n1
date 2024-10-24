@@ -41,3 +41,8 @@ INSERT INTO btl_nhom1.questions(questionText, imageLink, answer) VALUES
 ('Món ăn này được làm từ gạo, thường ăn kèm với các loại thức ăn khác.', 'https://xabuon.com/uploads1/news/10-04-23/xabuon-girl-xinh-haivl-xemvn-sex-10-04-2023168109632752.jpg', 'COM'),
 ('Nước ngọt có ga này thường có màu nâu, có vị ngọt.', 'https://www.shutterstock.com/image-photo/tbilisi-georgia-may-29-2024-600nw-2468450965.jpg', 'COCA-COLA'),
 ('Cơ quan này có nhiệm vụ bảo vệ đất nước.', 'https://file1.dangcongsan.vn/data/0/images/2021/12/29/phuongdt/qdnd.jpg', 'QUAN DOI');
+
+-- Thêm dòng này vào cuối file hoặc sau phần tạo bảng users
+
+ALTER TABLE `btl_nhom1`.`users` 
+ADD COLUMN `status` ENUM('Online', 'Offline', 'Ingame') NOT NULL DEFAULT 'Offline';

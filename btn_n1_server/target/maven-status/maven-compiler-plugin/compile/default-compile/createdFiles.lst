@@ -1,10 +1,10 @@
+service\ClientManager.class
+model\UserModel.class
 service\GameSession.class
 controller\UserController.class
 connection\DatabaseConnection.class
 controller\ResultController.class
 model\QuestionModel.class
+service\Client.class
 controller\QuestionController.class
 run\ServerRun.class
-service\ClientManager.class
-model\UserModel.class
-service\Client.class
