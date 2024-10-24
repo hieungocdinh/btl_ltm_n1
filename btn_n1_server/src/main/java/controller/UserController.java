@@ -59,23 +59,19 @@ public class UserController {
     }
 
     public String login(String username, String password) {
-        //  Check user exit
         try {
-            //Packing
-            UserModel user = new UserModel(username, password);
-            
             PreparedStatement p = con.prepareStatement(LOGIN_USER);
-            //  Login User 
-            p.setString(1, user.getUsername());
-            p.setString(2, user.getPassword());
+            p.setString(1, username);
+            p.setString(2, password);
             ResultSet r = p.executeQuery();
 
             if (r.next()) {
                 int id = r.getInt("id");
                 float score = r.getFloat("total_score");
+                updateUserStatus(String.valueOf(id), "Online");
                 return "success;" + id + ";" + username + ";" + score;
             } else {
-                return "failed;" + "Please enter the correct account password!";
+                return "failed;Please enter the correct account password!";
             }
         } catch (SQLException e) {
             e.printStackTrace();
@@ -98,23 +94,22 @@ public class UserController {
         }
     }
     
+    private final String GET_ALL_USERS = "SELECT id, username, full_name, total_score, status FROM users";
+
     public List<UserModel> getAllUsers() {
         List<UserModel> users = new ArrayList<>();
-        // Thêm ID vào truy vấn
-        String GET_ALL_USERS = "SELECT id, username, full_name, total_score FROM users"; 
 
         try (Statement stmt = con.createStatement();
              ResultSet rs = stmt.executeQuery(GET_ALL_USERS)) {
 
             while (rs.next()) {
-                // Lấy ID từ ResultSet
-                int id = rs.getInt("id"); // Thêm dòng này để lấy ID
+                int id = rs.getInt("id");
                 String username = rs.getString("username");
                 String fullName = rs.getString("full_name");
                 float totalScore = rs.getFloat("total_score");
+                String status = rs.getString("status");
 
-                // Giả sử UserModel có một constructor có 4 tham số để nhận ID
-                UserModel user = new UserModel(id, username, fullName, totalScore);
+                UserModel user = new UserModel(id, username, fullName, totalScore, status);
                 users.add(user);
             }
         } catch (SQLException e) {
@@ -124,4 +119,36 @@ public class UserController {
         return users;
     }
 
+    // Add method to update user status
+    public void updateUserStatus(String userId, String status) {
+        String sql = "UPDATE users SET status = ? WHERE id = ?";
+        try (PreparedStatement stmt = con.prepareStatement(sql)) {
+            stmt.setString(1, status);
+            stmt.setString(2, userId);
+            stmt.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public List<UserModel> getRankedUsers() {
+        List<UserModel> rankedUsers = new ArrayList<>();
+        String GET_RANKED_USERS = "SELECT username, total_score FROM users ORDER BY total_score DESC LIMIT 10";
+
+        try (Statement stmt = con.createStatement();
+             ResultSet rs = stmt.executeQuery(GET_RANKED_USERS)) {
+
+            while (rs.next()) {
+                String username = rs.getString("username");
+                float totalScore = rs.getFloat("total_score");
+
+                UserModel user = new UserModel(username, totalScore);
+                rankedUsers.add(user);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return rankedUsers;
+    }
 }

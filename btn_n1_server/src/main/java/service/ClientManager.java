@@ -1,5 +1,6 @@
 package service;
 
+import controller.UserController;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
@@ -45,6 +46,8 @@ public class ClientManager {
     public void createGameSession(Client player1, Client player2) {
         GameSession session = new GameSession(player1, player2);
         gameSessions.put(player1.getLoginUserId() + "-" + player2.getLoginUserId(), session);
+        updateUserStatus(player1.getLoginUserId(), "Ingame");
+        updateUserStatus(player2.getLoginUserId(), "Ingame");
         session.sendNextQuestionToPlayer1(); // Gửi câu hỏi đầu tiên cho user 1
         session.sendNextQuestionToPlayer2(); // Gửi câu hỏi đầu tiên cho user 2
     }
@@ -118,4 +121,17 @@ public class ClientManager {
 //        }
 //        return result;
 //    }
+
+    public void updateUserStatus(String userId, String status) {
+        UserController userController = new UserController();
+        userController.updateUserStatus(userId, status);
+    }
+
+    public void setUserOnline(String userId) {
+        updateUserStatus(userId, "Online");
+    }
+
+    public void setUserOffline(String userId) {
+        updateUserStatus(userId, "Offline");
+    }
 }

@@ -72,7 +72,6 @@ public class ClientRun {
                         listView = new ListView();
                     }
                     listView.loadUserName();
-                    listView.loadUserList();
                     listView.setVisible(true);
                     break;
                 case MATCH:

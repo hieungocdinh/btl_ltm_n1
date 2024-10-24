@@ -184,5 +184,9 @@ public class GameSession {
 
         // Loại bỏ phiên chơi khỏi ClientManager
         ServerRun.clientManager.removeGameSession(this);
+
+        // Update user status after the game ends
+        ServerRun.clientManager.updateUserStatus(player1.getLoginUserId(), "Online");
+        ServerRun.clientManager.updateUserStatus(player2.getLoginUserId(), "Online");
     }
 }

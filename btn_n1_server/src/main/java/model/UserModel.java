@@ -15,6 +15,7 @@ public class UserModel {
     private String password;
     private String fullName;
     private float totalScore;
+    private String status;
 
     // Constructor không có id
     public UserModel(String username, String password) {
@@ -36,10 +37,16 @@ public class UserModel {
         this.totalScore = totalScore;
     }
    
-    public UserModel(int id, String username, String fullName, float totalScore) {
+    public UserModel(int id, String username, String fullName, float totalScore, String status) {
         this.id = id;
         this.username = username;
         this.fullName = fullName;
+        this.totalScore = totalScore;
+        this.status = status;
+    }
+
+    public UserModel(String username, float totalScore) {
+        this.username = username;
         this.totalScore = totalScore;
     }
 
@@ -85,14 +92,23 @@ public class UserModel {
         this.totalScore = totalScore;
     }
 
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
+    }
+
     @Override
     public String toString() {
-        return "User{"
-                + "id=" + id
-                + ", username='" + username + '\''
-                + ", password='" + password + '\''
-                + ", fullName='" + fullName + '\''
-                + ", totalScore=" + totalScore
-                + '}';
+        return "User{" +
+                "id=" + id +
+                ", username='" + username + '\'' +
+                ", password='" + password + '\'' +
+                ", fullName='" + fullName + '\'' +
+                ", totalScore=" + totalScore +
+                ", status='" + status + '\'' +
+                '}';
     }
 }

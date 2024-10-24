@@ -75,6 +75,18 @@ public class Client implements Runnable {
                         break;
                     case "EXIT":
                         running = false;
+                    case "INVITE":
+                        handleInvitation(received);
+                        break;
+                    case "ACCEPT_INVITE":
+                        handleAcceptInvitation(received);
+                        break;
+                    case "DECLINE_INVITE":
+                        handleDeclineInvitation(received);
+                        break;
+                    case "GET_RANKING":
+                        handleRankingRequest();
+                        break;
                 }
 
             } catch (IOException ex) {
@@ -97,6 +109,8 @@ public class Client implements Runnable {
 
             // remove from clientManager
             ServerRun.clientManager.remove(this);
+
+            ServerRun.clientManager.setUserOffline(this.loginUserId);
 
         } catch (IOException ex) {
             Logger.getLogger(Client.class.getName()).log(Level.SEVERE, null, ex);
@@ -140,15 +154,16 @@ public class Client implements Runnable {
         // Tạo chuỗi kết quả để gửi lại cho client
         StringBuilder userList = new StringBuilder("USER_LIST;");
         for (UserModel user : users) {
-            userList.append(user.getId()).append(";")
-                    .append(user.getUsername()).append(";")
-                    .append(user.getFullName()).append(";")
-                    .append(user.getTotalScore()).append(";"); // Có thể thay đổi thông tin gửi đi nếu cần
+            if (!String.valueOf(user.getId()).equals(this.loginUserId)) { // Exclude the logged-in user
+                userList.append(user.getId()).append(";")
+                        .append(user.getUsername()).append(";")
+                        .append(user.getFullName()).append(";")
+                        .append(user.getTotalScore()).append(";")
+                        .append(user.getStatus()).append(";");
+            }
         }
 
-        System.out.println("Gui yeu cau ve client");
-
-        // Gửi danh sách người dùng về client
+        // Send the user list back to the client
         sendData(userList.toString());
     }
 
@@ -198,11 +213,17 @@ public class Client implements Runnable {
             // set login user
             this.loginUser = username;
             this.loginUserId = parts[1];
+            ServerRun.clientManager.setUserOnline(this.loginUserId);
             System.out.println("id da login: " + loginUserId);
         }
 
         // send result
         sendData("LOGIN" + ";" + result);
+
+        // Request user list after successful login
+        if (result.split(";")[0].equals("success")) {
+            onRequestUserList();
+        }
     }
 
     private void onReceiveRegister(String received) {
@@ -217,5 +238,51 @@ public class Client implements Runnable {
 
         // send result
         sendData("REGISTER" + ";" + result);
+    }
+
+    private void handleInvitation(String received) {
+        String[] parts = received.split(";");
+        String invitedUserId = parts[1];
+        Client invitedClient = ServerRun.clientManager.getClientById(invitedUserId);
+        if (invitedClient != null) {
+            invitedClient.sendData("INVITE;" + this.loginUserId + ";" + this.loginUser);
+        }
+    }
+
+    private void handleAcceptInvitation(String received) {
+        String[] parts = received.split(";");
+        String invitingUserId = parts[1];
+        Client invitingClient = ServerRun.clientManager.getClientById(invitingUserId);
+        if (invitingClient != null) {
+            // Create a new game session
+            ServerRun.clientManager.createGameSession(invitingClient, this);
+            invitingClient.sendData("GAME_STARTED;" + this.loginUserId);
+            this.sendData("GAME_STARTED;" + invitingUserId);
+        }
+    }
+
+    private void handleDeclineInvitation(String received) {
+        String[] parts = received.split(";");
+        String invitingUserId = parts[1];
+        Client invitingClient = ServerRun.clientManager.getClientById(invitingUserId);
+        if (invitingClient != null) {
+            invitingClient.sendData("INVITE_DECLINED;" + this.loginUserId);
+        }
+    }
+
+    private void handleRankingRequest() {
+        UserController userController = new UserController();
+        List<UserModel> rankedUsers = userController.getRankedUsers();
+
+        StringBuilder rankingData = new StringBuilder("RANKING;");
+        int rank = 1;
+        for (UserModel user : rankedUsers) {
+            rankingData.append(rank).append(";")
+                       .append(user.getUsername()).append(";")
+                       .append(user.getTotalScore()).append(";");
+            rank++;
+        }
+
+        sendData(rankingData.toString());
     }
 }
