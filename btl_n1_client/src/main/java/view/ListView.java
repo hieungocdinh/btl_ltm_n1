@@ -12,6 +12,8 @@ import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
+import javax.swing.JPanel;
+import java.awt.FlowLayout;
 import run.ClientRun;
 
 /**
@@ -25,7 +27,7 @@ public class ListView extends javax.swing.JFrame {
     private JTable dataTable;
     private JScrollPane scrollPane;
     private JButton inviteButton; // Thêm nút mời người chơi
-
+    private JButton rankingButton;
 
     /**
      * Creates new form ListView
@@ -44,7 +46,7 @@ public class ListView extends javax.swing.JFrame {
         welcomeLabel.setFont(new java.awt.Font("Segoe UI", java.awt.Font.BOLD, 18));
         
         // Tạo bảng dữ liệu mẫu
-        String[] columnNames = {"ID", "Username", "Full Name", "Score"}; // Cập nhật tiêu đề cột
+        String[] columnNames = {"ID", "Username", "Full Name", "Score", "Status"}; // Cập nhật tiêu đề cột
         Object[][] data = {
 //            {1, "johndoe", "John Doe", 85.0},
 //            {2, "janesmith", "Jane Smith", 90.5},
@@ -54,16 +56,22 @@ public class ListView extends javax.swing.JFrame {
         dataTable = new JTable(data, columnNames);
         scrollPane = new JScrollPane(dataTable);
 
-        // Tạo nút Refresh
-        refreshButton = new JButton("Refresh");
-        refreshButton.addActionListener(evt -> {
-            // Xử lý sự kiện khi nhấn nút Refresh
-            loadUserList();
-        });
-        
-        // Tạo nút Invite Player
+        // Tạo các nút
         inviteButton = new JButton("Invite Player");
         inviteButton.addActionListener(evt -> invitePlayer());
+
+        refreshButton = new JButton("Refresh");
+        refreshButton.addActionListener(evt -> loadUserList());
+
+        rankingButton = new JButton("Ranking");
+        rankingButton.addActionListener(evt -> showRanking());
+
+        // Tạo một JPanel để chứa các nút
+        JPanel buttonPanel = new JPanel();
+        buttonPanel.setLayout(new FlowLayout(FlowLayout.LEFT));
+        buttonPanel.add(inviteButton);
+        buttonPanel.add(refreshButton);
+        buttonPanel.add(rankingButton);
 
         // Sắp xếp layout
         GroupLayout layout = new GroupLayout(getContentPane());
@@ -76,16 +84,14 @@ public class ListView extends javax.swing.JFrame {
             layout.createParallelGroup(GroupLayout.Alignment.LEADING)
                 .addComponent(welcomeLabel)
                 .addComponent(scrollPane)
-                .addComponent(refreshButton)
-                .addComponent(inviteButton)
+                .addComponent(buttonPanel)
         );
 
         layout.setVerticalGroup(
             layout.createSequentialGroup()
                 .addComponent(welcomeLabel)
                 .addComponent(scrollPane)
-                .addComponent(refreshButton)
-                .addComponent(inviteButton)
+                .addComponent(buttonPanel)
         );
 
         pack();
@@ -96,30 +102,28 @@ public class ListView extends javax.swing.JFrame {
     private void invitePlayer() {
         int selectedRow = dataTable.getSelectedRow(); // Lấy dòng được chọn trong bảng
         if (selectedRow != -1) {
-            String selectedUserId = dataTable.getValueAt(selectedRow, 0).toString(); // Lấy ID của người dùng được chọn
-            String selectedUsername = dataTable.getValueAt(selectedRow, 1).toString(); // Lấy tên người dùng được chọn
-
-            // Gửi yêu cầu mời người chơi lên server
-            ClientRun.socketHandler.invitePlayer(selectedUserId);
+            String invitedUserId = dataTable.getValueAt(selectedRow, 0).toString(); // Lấy ID của người dùng được chọn
+            ClientRun.socketHandler.sendInvitation(invitedUserId);
         } else {
-            JOptionPane.showMessageDialog(this, "Vui lòng chọn người chơi để mời!");
+            JOptionPane.showMessageDialog(this, "Vui lòng chọn người chơi để mời!", "No Player Selected", JOptionPane.WARNING_MESSAGE);
         }
     }
 
-    
+    private void loadUserList() {
+        ClientRun.socketHandler.requestUserList();
+    }
+
+    private void showRanking() {
+        ClientRun.socketHandler.requestRanking();
+    }
+
     public void updateUserList(Object[][] userData) {
-        // Cập nhật dữ liệu trong JTable
         dataTable.setModel(new javax.swing.table.DefaultTableModel(
             userData,
-            new String[] {"ID", "Username", "Full Name", "Score"} // Cập nhật tiêu đề cột ở đây
+            new String[] {"ID", "Username", "Full Name", "Score", "Status"} // Add "Status" to column names
         ));
     }
 
-    public void loadUserList() {
-        // Gọi yêu cầu lấy danh sách người dùng từ socketHandler
-        ClientRun.socketHandler.requestUserList();
-    }
-    
     public void loadUserName(){
         // Lấy username để hiển thị
         String username = ClientRun.socketHandler.getLoginUsername();

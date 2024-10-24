@@ -4,6 +4,7 @@
  */
 package controller;
 
+import java.awt.Dimension;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
@@ -15,6 +16,9 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JOptionPane;
+import javax.swing.JScrollPane;
+import javax.swing.JTable;
+import javax.swing.table.DefaultTableModel;
 import run.ClientRun;
 import view.ListView;
 
@@ -106,6 +110,18 @@ public class SocketHandler {
                         break;
                     case "ERROR":
                         // Handle error
+                        break;
+                    case "INVITE":
+                        onReceiveInvitation(received);
+                        break;
+                    case "GAME_STARTED":
+                        onGameStarted(received);
+                        break;
+                    case "INVITE_DECLINED":
+                        onInviteDeclined(received);
+                        break;
+                    case "RANKING":
+                        onReceiveRanking(received);
                         break;
                 }
             } catch (IOException ex) {
@@ -207,29 +223,19 @@ public class SocketHandler {
     private void onReceiveUserList(String received) {
         String[] splitted = received.split(";");
         if (splitted.length > 1) {
-            // Tạo danh sách để chứa người dùng
-            List<Object[]> filteredUserList = new ArrayList<>();
+            List<Object[]> userList = new ArrayList<>();
 
-            for (int i = 1; i < splitted.length; i += 4) {
-                String userId = splitted[i]; // ID của người dùng
-
-                // Kiểm tra xem ID có trùng với người dùng hiện tại không
-                if (!userId.equals(this.loginUserId)) {
-                    // Thêm thông tin người dùng vào danh sách nếu không phải chính mình
-                    Object[] user = new Object[4];
-                    user[0] = userId;     // ID
-                    user[1] = splitted[i + 1]; // Username
-                    user[2] = splitted[i + 2]; // Full Name
-                    user[3] = splitted[i + 3]; // Score
-
-                    filteredUserList.add(user);
-                }
+            for (int i = 1; i < splitted.length; i += 5) {
+                Object[] user = new Object[5];
+                user[0] = splitted[i];     // ID
+                user[1] = splitted[i + 1]; // Username
+                user[2] = splitted[i + 2]; // Full Name
+                user[3] = splitted[i + 3]; // Score
+                user[4] = splitted[i + 4]; // Status
+                userList.add(user);
             }
 
-            // Chuyển danh sách người dùng thành mảng 2 chiều
-            Object[][] userData = filteredUserList.toArray(new Object[0][]);
-
-            // Cập nhật dữ liệu trong ListView
+            Object[][] userData = userList.toArray(new Object[0][]);
             ClientRun.listView.updateUserList(userData);
         }
     }
@@ -301,5 +307,71 @@ public class SocketHandler {
             ClientRun.closeScene(ClientRun.SceneName.REGISTER);
             ClientRun.openScene(ClientRun.SceneName.LOGIN);
         }
+    }
+
+    public void sendInvitation(String invitedUserId) {
+        sendData("INVITE;" + invitedUserId);
+    }
+
+    private void onReceiveInvitation(String received) {
+        String[] parts = received.split(";");
+        String invitingUserId = parts[1];
+        String invitingUsername = parts[2];
+
+        int choice = JOptionPane.showConfirmDialog(
+            null,
+            invitingUsername + " invites you to play. Do you accept?",
+            "Game Invitation",
+            JOptionPane.YES_NO_OPTION
+        );
+
+        if (choice == JOptionPane.YES_OPTION) {
+            sendData("ACCEPT_INVITE;" + invitingUserId);
+        } else {
+            sendData("DECLINE_INVITE;" + invitingUserId);
+        }
+    }
+
+    private void onGameStarted(String received) {
+        String[] parts = received.split(";");
+        String opponentId = parts[1];
+        JOptionPane.showMessageDialog(null, "Game started with player " + opponentId);
+        ClientRun.openScene(ClientRun.SceneName.MATCH);
+    }
+
+    private void onInviteDeclined(String received) {
+        String[] parts = received.split(";");
+        String declinedUserId = parts[1];
+        JOptionPane.showMessageDialog(null, "Player " + declinedUserId + " declined your invitation.");
+    }
+
+    public void requestRanking() {
+        sendData("GET_RANKING");
+    }
+
+    private void onReceiveRanking(String received) {
+        String[] parts = received.split(";");
+        if (parts.length > 1) {
+            List<Object[]> rankingList = new ArrayList<>();
+
+            for (int i = 1; i < parts.length; i += 3) {
+                Object[] user = new Object[3];
+                user[0] = Integer.parseInt(parts[i]);     // Rank
+                user[1] = parts[i + 1];                   // Username
+                user[2] = Float.parseFloat(parts[i + 2]); // Score
+                rankingList.add(user);
+            }
+
+            Object[][] rankingData = rankingList.toArray(new Object[0][]);
+            showRankingDialog(rankingData);
+        }
+    }
+
+    private void showRankingDialog(Object[][] rankingData) {
+        JTable rankingTable = new JTable(rankingData, new String[]{"Rank", "Username", "Score"});
+        JScrollPane scrollPane = new JScrollPane(rankingTable);
+        scrollPane.setPreferredSize(new Dimension(300, 200));
+
+        JOptionPane.showMessageDialog(null, scrollPane, "Player Rankings", JOptionPane.INFORMATION_MESSAGE);
     }
 }
