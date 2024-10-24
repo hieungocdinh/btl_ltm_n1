@@ -154,14 +154,16 @@ public class Client implements Runnable {
         // Tạo chuỗi kết quả để gửi lại cho client
         StringBuilder userList = new StringBuilder("USER_LIST;");
         for (UserModel user : users) {
-            userList.append(user.getId()).append(";")
-                    .append(user.getUsername()).append(";")
-                    .append(user.getFullName()).append(";")
-                    .append(user.getTotalScore()).append(";")
-                    .append(user.getStatus()).append(";");
+            if (!String.valueOf(user.getId()).equals(this.loginUserId)) { // Exclude the logged-in user
+                userList.append(user.getId()).append(";")
+                        .append(user.getUsername()).append(";")
+                        .append(user.getFullName()).append(";")
+                        .append(user.getTotalScore()).append(";")
+                        .append(user.getStatus()).append(";");
+            }
         }
 
-        // Gửi danh sách người dùng về client
+        // Send the user list back to the client
         sendData(userList.toString());
     }
 
@@ -217,6 +219,11 @@ public class Client implements Runnable {
 
         // send result
         sendData("LOGIN" + ";" + result);
+
+        // Request user list after successful login
+        if (result.split(";")[0].equals("success")) {
+            onRequestUserList();
+        }
     }
 
     private void onReceiveRegister(String received) {

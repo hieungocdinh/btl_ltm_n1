@@ -334,8 +334,6 @@ public class SocketHandler {
 
     private void onGameStarted(String received) {
         String[] parts = received.split(";");
-        String opponentId = parts[1];
-        JOptionPane.showMessageDialog(null, "Game started with player " + opponentId);
         ClientRun.openScene(ClientRun.SceneName.MATCH);
     }
 
